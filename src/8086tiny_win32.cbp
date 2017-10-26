@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="8086tiny_win32" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug32">
+				<Option output="bin/Debug32/8086tiny" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug32/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option parameters="bios_src\cga_bios.img fd.img" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release32">
+				<Option output="bin/Release32/8086tiny" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release32/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-fno-strict-aliasing" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wshadow" />
+			<Add option="-Wredundant-decls" />
+			<Add option="-pedantic" />
+			<Add option="-Wextra" />
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add option="-DWINVER=0x0501" />
+			<Add directory="." />
+			<Add directory="win32" />
+			<Add directory="shared" />
+		</Compiler>
+		<Linker>
+			<Add option="-static" />
+			<Add library="winmm" />
+			<Add library="ws2_32" />
+		</Linker>
+		<Unit filename="8086tiny_interface.h" />
+		<Unit filename="8086tiny_new.cpp" />
+		<Unit filename="shared/cga_glyphs.cpp" />
+		<Unit filename="shared/cga_glyphs.h" />
+		<Unit filename="shared/debug_disasm.cpp" />
+		<Unit filename="shared/debug_disasm.h" />
+		<Unit filename="shared/file_dialog.h" />
+		<Unit filename="shared/serial_emulation.cpp" />
+		<Unit filename="shared/serial_emulation.h" />
+		<Unit filename="shared/serial_hw.h" />
+		<Unit filename="shared/vga_glyphs.cpp" />
+		<Unit filename="shared/vga_glyphs.h" />
+		<Unit filename="win32/8086tiny_interface_win.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="win32/resource.h" />
+		<Unit filename="win32/win32_8086tiny_interface.cpp" />
+		<Unit filename="win32/win32_cga.cpp" />
+		<Unit filename="win32/win32_cga.h" />
+		<Unit filename="win32/win32_cpu_speed_dialog.cpp" />
+		<Unit filename="win32/win32_cpu_speed_dialog.h" />
+		<Unit filename="win32/win32_debug.cpp" />
+		<Unit filename="win32/win32_debug.h" />
+		<Unit filename="win32/win32_file_dialog.cpp" />
+		<Unit filename="win32/win32_serial_cfg.cpp" />
+		<Unit filename="win32/win32_serial_cfg.h" />
+		<Unit filename="win32/win32_serial_hw.cpp" />
+		<Unit filename="win32/win32_snd_drv.cpp" />
+		<Unit filename="win32/win32_snd_drv.h" />
+		<Unit filename="win32/win32_sound_cfg.cpp" />
+		<Unit filename="win32/win32_sound_cfg.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
