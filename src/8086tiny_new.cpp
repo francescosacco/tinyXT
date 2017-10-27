@@ -34,13 +34,12 @@
 #endif
 
 #include "8086tiny_interface.h"
+#include "emulator/XTmemory.h"
 
 T8086TinyInterface_t Interface;
 
 // Emulator system constants
 
-#define IO_PORT_COUNT 0x10000
-#define RAM_SIZE 0x10FFF0
 #define REGS_BASE 0xF0000
 
 // 16-bit register decodes
@@ -194,7 +193,7 @@ static unsigned int vmem_src, vmem_dest;
 #define CAST(a) *(a*)&
 
 // Global variable definitions
-unsigned char mem[RAM_SIZE], io_ports[IO_PORT_COUNT], *opcode_stream, *regs8, i_rm, i_w, i_reg, i_mod, i_mod_size, i_d, i_reg4bit, raw_opcode_id, xlat_opcode_id, extra, rep_mode, seg_override_en, rep_override_en, trap_flag, scratch_uchar;
+unsigned char *opcode_stream, *regs8, i_rm, i_w, i_reg, i_mod, i_mod_size, i_d, i_reg4bit, raw_opcode_id, xlat_opcode_id, extra, rep_mode, seg_override_en, rep_override_en, trap_flag, scratch_uchar;
 unsigned char  bios_table_lookup[20][256];
 unsigned short *regs16, reg_ip, seg_override, file_index;
 unsigned int op_source, op_dest, rm_addr, op_to_addr, op_from_addr, i_data0, i_data1, i_data2, scratch_uint, scratch2_uint, set_flags_type;

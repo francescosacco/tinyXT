@@ -49,6 +49,10 @@
 		</Linker>
 		<Unit filename="8086tiny_interface.h" />
 		<Unit filename="8086tiny_new.cpp" />
+		<Unit filename="emulator/XTmemory.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="emulator/XTmemory.h" />
 		<Unit filename="shared/cga_glyphs.cpp" />
 		<Unit filename="shared/cga_glyphs.h" />
 		<Unit filename="shared/debug_disasm.cpp" />
