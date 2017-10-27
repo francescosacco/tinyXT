@@ -19,13 +19,7 @@
 #include "serial_emulation.h"
 #include "serial_hw.h"
 
-// Need to decide which get ticks function to use.
-#ifdef __SDL__
-#include "SDL.h"
-#define GET_TICKS SDL_GetTicks
-#else
 #define GET_TICKS timeGetTime
-#endif // __SDL__
 
 // =============================================================================
 // Local Functions

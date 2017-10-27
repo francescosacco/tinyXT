@@ -9,7 +9,7 @@
 #ifndef __8086TINY_INTERFACE_H
 #define __8086TINY_INTERFACE_H
 
-#if defined(_WIN32) && !defined(__SDL__)
+#if defined(_WIN32)
 #include <Windows.h>
 #endif
 
@@ -26,7 +26,7 @@ public:
   T8086TinyInterface_t();
   ~T8086TinyInterface_t();
 
-#if defined(_WIN32) && !defined(__SDL__)
+#if defined(_WIN32)
   // Function: SetInstance
   //
   // Description:
@@ -259,7 +259,7 @@ private:
   unsigned char Port[65536];
   unsigned char *mem;
 
-#if defined(_WIN32) && !defined(__SDL__)
+#if defined(_WIN32)
   HINSTANCE hInstance;
 #endif
 };

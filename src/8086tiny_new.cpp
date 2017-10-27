@@ -339,7 +339,7 @@ void Reset(void)
 
 // Emulator entry point
 
-#if defined(_WIN32) && !defined(__SDL__)
+#if defined(_WIN32)
 int CALLBACK WinMain(
   HINSTANCE hInstance,
   HINSTANCE /* hPrevInstance */,
@@ -350,7 +350,7 @@ int main(int argc, char **argv)
 #endif
 {
 
-#if defined(_WIN32) && !defined(__SDL__)
+#if defined(_WIN32)
   Interface.SetInstance(hInstance);
 #endif
   Interface.Initialise(mem);
