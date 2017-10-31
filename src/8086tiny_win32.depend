@@ -264,7 +264,7 @@
 	"win32_sound_cfg.h"
 	"resource.h"
 
-1509077156 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_new.cpp
+1509568673 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_new.cpp
 	<time.h>
 	<memory.h>
 	<stdio.h>
@@ -277,4 +277,10 @@
 	<conio.h>
 	<io.h>
 	"8086tiny_interface.h"
+	"emulator/XTmemory.h"
+
+1509164467 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\emulator\xtmemory.c
+	"XTmemory.h"
+
+1509164895 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\emulator\xtmemory.h
 
