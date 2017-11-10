@@ -14,7 +14,6 @@
 #define IDM_TEXT_CGA                            40004
 #define IDM_TEXT_VGA_8x16                       40005
 #define IDM_SET_SPEED                           40006
-#define IDM_SET__BIOS                           40007
 #define IDM_SAVE_CONFIGURATION                  40008
 #define IDM_LOAD_CONFIGURATION                  40009
 #define IDM_SAVE_DEFAULT_CONFIGURTION           40010

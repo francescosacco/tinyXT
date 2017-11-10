@@ -34,8 +34,6 @@ IDR_MENU1 MENU
             MENUITEM "Set &HD Image ...", IDM_SET__HD_IMAGE
         }
         MENUITEM SEPARATOR
-        MENUITEM "Set &Bios Image ...", IDM_SET__BIOS
-        MENUITEM SEPARATOR
         MENUITEM "Set Speed ...", IDM_SET_SPEED
         MENUITEM "Set Serial Ports ...", IDM_SET_SERIAL_PORTS
         MENUITEM "Configure Sound ...", IDM_CONFIGURE_SOUND

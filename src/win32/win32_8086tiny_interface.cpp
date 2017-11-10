@@ -779,10 +779,6 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
           OpenFileDialog("Select hard drive image...", HDFilename, 1024, "image file\0*.img\0\0");
           break;
 
-        case IDM_SET__BIOS:
-          OpenFileDialog("Select BIOS image...", BiosFilename, 1024, "image file\0*.img\0\0");
-          break;
-
         case IDM_SET_SPEED:
           CPU_SPEED_Dialog(MyInstance, hwnd, CPU_Clock_Hz);
           break;
