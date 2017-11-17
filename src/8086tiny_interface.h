@@ -181,26 +181,6 @@ public:
   //
   bool TimerTick(int nTicks);
 
-  // Function: CheckBreakPoints
-  //
-  // Description:
-  // Check if a break point has been triggered.
-  // Normally break points are checked in TimerTick(), however the way H/W
-  // interrupts are handled means that the TimerTick will miss the address
-  // for the first instructions of H/W interrupt handlers.
-  // This needs to be called after a H/W interrupt is triggered to
-  // check if the new address is a break point.
-  //
-  // Parameters:
-  //
-  //   None.
-  //
-  // Returns:
-  //
-  //   None.
-  //
-  void CheckBreakPoints(void);
-
   // Function: WritePort
   //
   // Description:

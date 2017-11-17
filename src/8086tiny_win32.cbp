@@ -56,7 +56,6 @@
 		<Unit filename="shared/cga_glyphs.cpp" />
 		<Unit filename="shared/cga_glyphs.h" />
 		<Unit filename="shared/debug_disasm.cpp" />
-		<Unit filename="shared/debug_disasm.h" />
 		<Unit filename="shared/file_dialog.h" />
 		<Unit filename="shared/serial_emulation.cpp" />
 		<Unit filename="shared/serial_emulation.h" />
@@ -73,7 +72,6 @@
 		<Unit filename="win32/win32_cpu_speed_dialog.cpp" />
 		<Unit filename="win32/win32_cpu_speed_dialog.h" />
 		<Unit filename="win32/win32_debug.cpp" />
-		<Unit filename="win32/win32_debug.h" />
 		<Unit filename="win32/win32_file_dialog.cpp" />
 		<Unit filename="win32/win32_serial_cfg.cpp" />
 		<Unit filename="win32/win32_serial_cfg.h" />

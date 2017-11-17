@@ -14,13 +14,7 @@
 #define IDM_TEXT_CGA                            40004
 #define IDM_TEXT_VGA_8x16                       40005
 #define IDM_SET_SPEED                           40006
-#define IDM_SAVE_CONFIGURATION                  40008
-#define IDM_LOAD_CONFIGURATION                  40009
-#define IDM_SAVE_DEFAULT_CONFIGURTION           40010
-#define IDM_SET__FD_IMAGE                       40011
-#define IDM_SET__HD_IMAGE                       40012
 #define IDM_SET_SERIAL_PORTS                    40013
-#define IDM_START_DEBUGGER                      40014
 #define IDM_CONFIGURE_SOUND                     40015
 #define IDC_EDIT_CS                             40101
 #define IDC_EDIT_SS                             40102

@@ -173,14 +173,14 @@
 
 1395765874 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\vga_glyphs.h
 
-1399146166 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\8086tiny_interface_win.rc
+1510929164 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\8086tiny_interface_win.rc
 	<windows.h>
 	<commctrl.h>
 	<richedit.h>
 	<winnt.h>
 	"resource.h"
 
-1510927517 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\resource.h
+1510929225 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\resource.h
 
 1509077538 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_8086tiny_interface.cpp
 	"8086tiny_interface.h"
@@ -199,7 +199,7 @@
 	"win32_sound_cfg.h"
 	"win32_snd_drv.h"
 
-1509077145 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_interface.h
+1510928488 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_interface.h
 	<Windows.h>
 
 1400468036 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\file_dialog.h
@@ -264,7 +264,7 @@
 	"win32_sound_cfg.h"
 	"resource.h"
 
-1509568991 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_new.cpp
+1510928500 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_new.cpp
 	<time.h>
 	<memory.h>
 	<stdio.h>

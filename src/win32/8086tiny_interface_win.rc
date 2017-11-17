@@ -28,12 +28,6 @@ IDR_MENU1 MENU
     }
     POPUP "&Configuration"
     {
-        POPUP "Disks"
-        {
-            MENUITEM "Set &FD Image ...", IDM_SET__FD_IMAGE
-            MENUITEM "Set &HD Image ...", IDM_SET__HD_IMAGE
-        }
-        MENUITEM SEPARATOR
         MENUITEM "Set Speed ...", IDM_SET_SPEED
         MENUITEM "Set Serial Ports ...", IDM_SET_SERIAL_PORTS
         MENUITEM "Configure Sound ...", IDM_CONFIGURE_SOUND
@@ -48,14 +42,6 @@ IDR_MENU1 MENU
             MENUITEM "CGA 8x8", IDM_TEXT_CGA
             MENUITEM "VGA 8x16", IDM_TEXT_VGA_8x16
         }
-        MENUITEM SEPARATOR
-        MENUITEM "Save Default Configuration", IDM_SAVE_DEFAULT_CONFIGURTION
-        MENUITEM "Save Configuration ...", IDM_SAVE_CONFIGURATION
-        MENUITEM "Load Configuration ...", IDM_LOAD_CONFIGURATION
-    }
-    POPUP "Debug"
-    {
-        MENUITEM "Start Debugger...", IDM_START_DEBUGGER
     }
 }
 

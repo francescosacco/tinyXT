@@ -22,7 +22,6 @@
 
 #include "win32_cga.h"
 #include "win32_serial_cfg.h"
-#include "win32_debug.h"
 #include "win32_cpu_speed_dialog.h"
 #include "win32_sound_cfg.h"
 #include "win32_snd_drv.h"
@@ -638,31 +637,9 @@ int ReadConfig(const char *Filename)
   return 1;
 }
 
-int WriteConfigFile(const char *Filename)
-{
-  FILE *fp = fopen(Filename, "wt");
-  if (fp == NULL) return 0;
-
-  fprintf(fp, "[BIOS]\n");
-  fprintf(fp, "%s\n", BiosFilename[0] ? BiosFilename : "NIL");
-  fprintf(fp, "[FD]\n");
-  fprintf(fp, "%s\n", FDFilename[0] ? FDFilename : "NIL");
-  fprintf(fp, "[HD]\n");
-  fprintf(fp, "%s\n", HDFilename[0] ? HDFilename : "NIL");
-  fprintf(fp, "[CPU_SPEED]\n");
-  fprintf(fp, "%d\n", CPU_Clock_Hz);
-
-  SERIAL_WriteConfig(fp);
-  SNDCFG_Write(fp);
-
-  fclose(fp);
-  return 1;
-}
-
 LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   unsigned int KeyCode;
-  char Filename[1024];
 
   switch (message)                  /* handle the messages */
   {
@@ -771,14 +748,6 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
           DestroyWindow(hwnd);
           break;
 
-        case IDM_SET__FD_IMAGE:
-          FDImageChanged = OpenFileDialog("Select floppy image...", FDFilename, 1024, "image file\0*.img\0\0");
-          break;
-
-        case IDM_SET__HD_IMAGE:
-          OpenFileDialog("Select hard drive image...", HDFilename, 1024, "image file\0*.img\0\0");
-          break;
-
         case IDM_SET_SPEED:
           CPU_SPEED_Dialog(MyInstance, hwnd, CPU_Clock_Hz);
           break;
@@ -836,28 +805,6 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
               CurrentSampleRate = AudioSampleRate;
             }
           }
-          break;
-
-        case IDM_LOAD_CONFIGURATION:
-          if (OpenFileDialog("Load configuration...", Filename, 1024, "configuration file\0*.cfg\0\0"))
-          {
-            ReadConfig(Filename);
-          }
-          break;
-
-        case IDM_SAVE_CONFIGURATION:
-          if (SaveFileDialog("Save configuration...", Filename, 1024, "configuration file\0*.cfg\0\0"))
-          {
-            WriteConfigFile(Filename);
-          }
-          break;
-
-        case IDM_SAVE_DEFAULT_CONFIGURTION:
-          WriteConfigFile("default.cfg");
-          break;
-
-        case IDM_START_DEBUGGER:
-          DEBUG_CreateDialog(MyInstance, hwnd);
           break;
       }
     }
@@ -955,7 +902,6 @@ bool T8086TinyInterface_t::Initialise(unsigned char *mem_in)
 
   CGA_Initialise();
   SERIAL_Initialise();
-  DEBUG_Initialise(mem_in);
 
   ReadConfig("default.cfg");
 
@@ -1114,39 +1060,6 @@ bool T8086TinyInterface_t::TimerTick(int nTicks)
     }
   }
 
-  // Debug processing
-
-  DebugState_t Dbg = DEBUG_GetState();
-  if ((BreakpointCount != 0) && (Dbg == DEBUG_NONE))
-  {
-    DEBUG_CheckBreak();
-    Dbg = DEBUG_GetState();
-    if (Dbg != DEBUG_NONE)
-    {
-      DEBUG_CreateDialog(MyInstance, hwndMain);
-    }
-  }
-
-  if (Dbg == DEBUG_STOPPED)
-  {
-    /* Update the debug dialog state */
-    DEBUG_Update();
-
-    /* Run the message loop until the debug state is no longer stopped */
-    while (GetMessage (&messages, NULL, 0, 0) &&
-           (Dbg == DEBUG_STOPPED))
-    {
-      /* Translate virtual-key messages into character messages */
-      TranslateMessage(&messages);
-      /* Send message to WindowProcedure */
-      DispatchMessage(&messages);
-
-      Dbg = DEBUG_GetState();
-    }
-
-    return false;
-  }
-
   // main update processing is every 4 ms of CPU time.
 
   CPU_Counter += nTicks;
@@ -1260,41 +1173,6 @@ bool T8086TinyInterface_t::TimerTick(int nTicks)
   }
 
   return NextVideoFrame;
-}
-
-void T8086TinyInterface_t::CheckBreakPoints(void)
-{
-  MSG messages;
-
-  DebugState_t Dbg = DEBUG_GetState();
-  if ((BreakpointCount != 0) && (Dbg == DEBUG_NONE))
-  {
-    DEBUG_CheckBreak();
-    Dbg = DEBUG_GetState();
-    if (Dbg != DEBUG_NONE)
-    {
-      DEBUG_CreateDialog(MyInstance, hwndMain);
-    }
-  }
-
-  if (Dbg == DEBUG_STOPPED)
-  {
-    /* Update the debug dialog state */
-    DEBUG_Update();
-
-    /* Run the message loop until the debug state is no longer stopped */
-    while (GetMessage (&messages, NULL, 0, 0) &&
-           (Dbg == DEBUG_STOPPED))
-    {
-      /* Translate virtual-key messages into character messages */
-      TranslateMessage(&messages);
-      /* Send message to WindowProcedure */
-      DispatchMessage(&messages);
-
-      Dbg = DEBUG_GetState();
-    }
-
-  }
 }
 
 void T8086TinyInterface_t::WritePort(int Address, unsigned char Value)

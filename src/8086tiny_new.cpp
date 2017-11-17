@@ -933,7 +933,6 @@ int main(int argc, char **argv)
         pc_interrupt(IntNo);
 
         regs16[REG_IP] = reg_ip;
-        Interface.CheckBreakPoints();
       }
     }
 
