@@ -45,22 +45,6 @@ extern int VolumeSample;
 bool SNDCFG_Read(FILE *fp);
 
 // =============================================================================
-// Function: SNDCFG_Write
-//
-// Description:
-// Write the sound configuration to the configuration file.
-//
-// Parameters:
-//
-//   fp : the file being written.
-//
-// Returns:
-//
-//   bool : true if a the sound configuration was written successfully.
-//
-bool SNDCFG_Write(FILE *fp);
-
-// =============================================================================
 // Function: SNDCFG_Dialog
 //
 // Description:

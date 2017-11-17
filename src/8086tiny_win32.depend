@@ -182,7 +182,7 @@
 
 1510929225 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\resource.h
 
-1509077538 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_8086tiny_interface.cpp
+1510929248 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_8086tiny_interface.cpp
 	"8086tiny_interface.h"
 	"resource.h"
 	<Windows.h>
@@ -194,7 +194,6 @@
 	"file_dialog.h"
 	"win32_cga.h"
 	"win32_serial_cfg.h"
-	"win32_debug.h"
 	"win32_cpu_speed_dialog.h"
 	"win32_sound_cfg.h"
 	"win32_snd_drv.h"
@@ -215,7 +214,7 @@
 1399314994 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_cpu_speed_dialog.h
 	<windows.h>
 
-1397590444 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_sound_cfg.h
+1510941469 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_sound_cfg.h
 	<windows.h>
 	<stdio.h>
 

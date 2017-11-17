@@ -215,18 +215,6 @@ bool SNDCFG_Read(FILE *fp)
   return true;
 }
 
-bool SNDCFG_Write(FILE *fp)
-{
-  fprintf(fp, "[SOUND_ENABLE]\n");
-  fprintf(fp, "%d\n", SoundEnabled ? 1 : 0);
-  fprintf(fp, "[SOUND_SAMPLE_RATE]\n");
-  fprintf(fp, "%d\n", AudioSampleRate);
-  fprintf(fp, "[SOUND_VOLUME]\n");
-  fprintf(fp, "%d\n", VolumePercent);
-
-  return true;
-}
-
 bool SNDCFG_Dialog(HINSTANCE hInstance, HWND hwnd)
 {
   int res;
