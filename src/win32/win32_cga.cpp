@@ -203,7 +203,6 @@ static unsigned char TextState[80*25*2];
 
 static ScreenMode_t CurrentScreenMode = SM_CO80;
 static bool ScreenFullRedraw = true;
-static int Scaling = 1;
 
 // =============================================================================
 // Local Functions
@@ -317,7 +316,7 @@ static void CGA_DrawCO40(HWND hwnd, unsigned char *mem)
 
   StretchDIBits(
     hdc,
-    0, 0, 640 * Scaling, 400 * Scaling, // dest x, y, w, h
+    0, 0, 640 , 400 , // dest x, y, w, h
     0, 0, 320, 200, // src x, y, w, h
     GFX320Bits,
     &GFX320bmi,
@@ -329,10 +328,10 @@ static void CGA_DrawCO40(HWND hwnd, unsigned char *mem)
   if (CursorDisplayOn && ((CRTRegister[0xA] & 0x1f) <= (CRTRegister[0xB] & 0x1F)))
   {
     RECT crect;
-    crect.top  = ((CursorLocation / 40) * 16 + (CRTRegister[0xA] & 0x1f) * 2) * Scaling;
-    crect.left = (CursorLocation % 40) * 16 * Scaling;
-    crect.bottom = ((CursorLocation / 40) * 16 + (CRTRegister[0xB] & 0x1F) * 2 + 2) * Scaling;
-    crect.right = crect.left + (16 * Scaling);
+    crect.top  = ((CursorLocation / 40) * 16 + (CRTRegister[0xA] & 0x1f) * 2) ;
+    crect.left = (CursorLocation % 40) * 16 ;
+    crect.bottom = ((CursorLocation / 40) * 16 + (CRTRegister[0xB] & 0x1F) * 2 + 2) ;
+    crect.right = crect.left + 16 ;
     InvertRect(hdc, &crect);
   }
 
@@ -407,7 +406,7 @@ static void VGA8_DrawCO40(HWND hwnd, unsigned char *mem)
 
   StretchDIBits(
     hdc,
-    0, 0, 640 * Scaling, 400 * Scaling, // dest x, y, w, h
+    0, 0, 640 , 400 , // dest x, y, w, h
     0, 80, 320, 400, // src x, y, w, h
     GFX640x480Bits,
     &GFX640x480bmi,
@@ -419,10 +418,10 @@ static void VGA8_DrawCO40(HWND hwnd, unsigned char *mem)
   if (CursorDisplayOn && ((CRTRegister[0xA] & 0x1f) <= (CRTRegister[0xB] & 0x1F)))
   {
     RECT crect;
-    crect.top  = ((CursorLocation / 40) * 16 + (CRTRegister[0xA] & 0x1f) * 2) * Scaling;
-    crect.left = (CursorLocation % 40) * 16 * Scaling;
-    crect.bottom = ((CursorLocation / 40) * 16 + (CRTRegister[0xB] & 0x1F) * 2 + 2) * Scaling;
-    crect.right = crect.left + (16 * Scaling);
+    crect.top  = ((CursorLocation / 40) * 16 + (CRTRegister[0xA] & 0x1f) * 2) ;
+    crect.left = (CursorLocation % 40) * 16 ;
+    crect.bottom = ((CursorLocation / 40) * 16 + (CRTRegister[0xB] & 0x1F) * 2 + 2) ;
+    crect.right = crect.left + 16 ;
     InvertRect(hdc, &crect);
   }
 
@@ -497,7 +496,7 @@ static void CGA_DrawCO80(HWND hwnd, unsigned char *mem)
 
   StretchDIBits(
     hdc,
-    0, 0, 640 * Scaling, 400 * Scaling, // dest x, y, w, h
+    0, 0, 640 , 400 , // dest x, y, w, h
     0, 0, 640, 200, // src x, y, w, h
     GFX640Bits,
     &GFX640bmi,
@@ -509,10 +508,10 @@ static void CGA_DrawCO80(HWND hwnd, unsigned char *mem)
   if (CursorDisplayOn && ((CRTRegister[0xA] & 0x1f) <= (CRTRegister[0xB] & 0x1F)))
   {
     RECT crect;
-    crect.top  = ((CursorLocation / 80) * 16 + (CRTRegister[0xA] & 0x1f) * 2) * Scaling;
-    crect.left = (CursorLocation % 80) * 8 * Scaling;
-    crect.bottom = ((CursorLocation / 80) * 16 + (CRTRegister[0xB] & 0x1F) * 2 + 2) * Scaling;
-    crect.right = crect.left + (8 * Scaling);
+    crect.top  = ((CursorLocation / 80) * 16 + (CRTRegister[0xA] & 0x1f) * 2) ;
+    crect.left = (CursorLocation % 80) * 8 ;
+    crect.bottom = ((CursorLocation / 80) * 16 + (CRTRegister[0xB] & 0x1F) * 2 + 2) ;
+    crect.right = crect.left + 8 ;
     InvertRect(hdc, &crect);
   }
 
@@ -585,39 +584,25 @@ static void VGA8_DrawCO80(HWND hwnd, unsigned char *mem)
     }
   }
 
-  if (Scaling == 1)
-  {
     SetDIBitsToDevice(
       hdc,
-      0, 0, 640 * Scaling, 400 * Scaling, // dest x, y, w, h
+      0, 0, 640 , 400 , // dest x, y, w, h
       0, 0,
       -80,
       480,
       GFX640x480Bits,
       &GFX640x480bmi,
       DIB_RGB_COLORS);
-  }
-  else
-  {
-    StretchDIBits(
-      hdc,
-      0, 0, 640 * Scaling, 400 * Scaling, // dest x, y, w, h
-      0, 80, 640, 400, // src x, y, w, h
-      GFX640x480Bits,
-      &GFX640x480bmi,
-      DIB_RGB_COLORS,
-      SRCCOPY);
-  }
 
   UpdateCursorstate();
 
   if (CursorDisplayOn && ((CRTRegister[0xA] & 0x1f) <= (CRTRegister[0xB] & 0x1F)))
   {
     RECT crect;
-    crect.top  = ((CursorLocation / 80) * 16 + (CRTRegister[0xA] & 0x1f) * 2) * Scaling;
-    crect.left = (CursorLocation % 80) * 8 * Scaling;
-    crect.bottom = ((CursorLocation / 80) * 16 + (CRTRegister[0xB] & 0x1F) * 2 + 2) * Scaling;
-    crect.right = crect.left + (8 * Scaling);
+    crect.top  = ((CursorLocation / 80) * 16 + (CRTRegister[0xA] & 0x1f) * 2) ;
+    crect.left = (CursorLocation % 80) * 8 ;
+    crect.bottom = ((CursorLocation / 80) * 16 + (CRTRegister[0xB] & 0x1F) * 2 + 2) ;
+    crect.right = crect.left + 8 ;
     InvertRect(hdc, &crect);
   }
 
@@ -720,7 +705,7 @@ static void CGA_DrawCO320(HWND hwnd, unsigned char *mem)
 
   StretchDIBits(
     hdc,
-    0, 0, 640 * Scaling, 400 * Scaling, // dest x, y, w, h
+    0, 0, 640 , 400 , // dest x, y, w, h
     0, 0, 320, 200, // src x, y, w, h
     GFX320Bits,
     &GFX320bmi,
@@ -862,7 +847,7 @@ static void CGA_Draw640(HWND hwnd, unsigned char *mem)
 
   StretchDIBits(
     hdc,
-    0, 0, 640 * Scaling, 400 * Scaling, // dest x, y, w, h
+    0, 0, 640 , 400 , // dest x, y, w, h
     0, 0, 640, 200, // src x, y, w, h
     GFX640Bits,
     &GFX640bmi,
@@ -937,7 +922,7 @@ static void MCGA_DrawMode11(HWND hwnd, unsigned char *mem)
 
   StretchDIBits(
     hdc,
-    0, 0, 640 * Scaling, 480 * Scaling, // dest x, y, w, h
+    0, 0, 640 , 480 , // dest x, y, w, h
     0, 0, 640, 480, // src x, y, w, h
     GFX640x480Bits,
     &GFX640x480bmi,
@@ -977,7 +962,7 @@ static void MCGA_DrawMode13(HWND hwnd, unsigned char *mem)
 
   StretchDIBits(
     hdc,
-    0, 0, 640 * Scaling, 400 * Scaling, // dest x, y, w, h
+    0, 0, 640 , 400 , // dest x, y, w, h
     0, 0, 320, 200, // src x, y, w, h
     GFX320Bits,
     &GFX320bmi,
@@ -1653,22 +1638,17 @@ void CGA_SetTextDisplay(TextDisplay_t Mode)
   ScreenFullRedraw = true;
 }
 
-void CGA_SetScale(int Scale)
-{
-  Scaling = Scale;
-}
-
 void CGA_GetDisplaySize(int &w, int &h)
 {
   if (CurrentScreenMode == SM_MODE11)
   {
-    w = 640 * Scaling;
-    h = 480 * Scaling;
+    w = 640 ;
+    h = 480 ;
   }
   else
   {
-    w = 640 * Scaling;
-    h = 400 * Scaling;
+    w = 640 ;
+    h = 400 ;
   }
 }
 

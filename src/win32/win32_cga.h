@@ -180,22 +180,6 @@ void CGA_VBlankStart(void);
 void CGA_SetTextDisplay(TextDisplay_t Mode);
 
 // =============================================================================
-// Function: CGA_SetScale
-//
-// Description:
-// Set the display scaling.
-//
-// Parameters:
-//
-//   Scale : Display scaling.
-//
-// Returns:
-//
-//   None.
-//
-void CGA_SetScale(int Scale);
-
-// =============================================================================
 // Function: CGA_GetDisplaySize
 //
 // Description:

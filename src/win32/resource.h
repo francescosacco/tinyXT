@@ -9,8 +9,6 @@
 #define IDD_DIALOG_SOUND_CFG                    108
 #define IDM_RESET                               40000
 #define IDM_QUIT                                40001
-#define IDM_SCALE_X1                            40002
-#define IDM_SCALE_X2                            40003
 #define IDM_TEXT_CGA                            40004
 #define IDM_TEXT_VGA_8x16                       40005
 #define IDM_SET_SPEED                           40006

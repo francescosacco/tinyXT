@@ -180,9 +180,9 @@
 	<winnt.h>
 	"resource.h"
 
-1510929225 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\resource.h
+1511176704 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\resource.h
 
-1510929248 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_8086tiny_interface.cpp
+1510942381 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_8086tiny_interface.cpp
 	"8086tiny_interface.h"
 	"resource.h"
 	<Windows.h>
@@ -257,7 +257,7 @@
 1399686032 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_snd_drv.cpp
 	"win32_snd_drv.h"
 
-1397798020 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_sound_cfg.cpp
+1510941431 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_sound_cfg.cpp
 	<windows.h>
 	<commctrl.h>
 	"win32_sound_cfg.h"

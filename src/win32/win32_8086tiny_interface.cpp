@@ -37,7 +37,6 @@ static HWND hwndMain;
 #define WIN_FLAGS (WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU)
 static int CurrentDispW = 0;
 static int CurrentDispH = 0;
-static int WindowScaling = 1;
 static TextDisplay_t WindowTextDisplay = TD_VGA_8x16;
 
 // emulation state control flags
@@ -649,16 +648,6 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
       break;
 
     case WM_INITMENU:
-      if (WindowScaling == 1)
-      {
-        CheckMenuItem((HMENU) wParam, IDM_SCALE_X1, MF_BYCOMMAND | MF_CHECKED);
-        CheckMenuItem((HMENU) wParam, IDM_SCALE_X2, MF_BYCOMMAND | MF_UNCHECKED);
-      }
-      else
-      {
-        CheckMenuItem((HMENU) wParam, IDM_SCALE_X1, MF_BYCOMMAND | MF_UNCHECKED);
-        CheckMenuItem((HMENU) wParam, IDM_SCALE_X2, MF_BYCOMMAND | MF_CHECKED);
-      }
       if (WindowTextDisplay == TD_CGA)
       {
         CheckMenuItem((HMENU) wParam, IDM_TEXT_CGA, MF_BYCOMMAND | MF_CHECKED);
@@ -752,20 +741,6 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
           CPU_SPEED_Dialog(MyInstance, hwnd, CPU_Clock_Hz);
           break;
 
-        case IDM_SCALE_X1:
-        {
-          WindowScaling = 1;
-          CGA_SetScale(1);
-          break;
-        }
-
-        case IDM_SCALE_X2:
-        {
-          WindowScaling = 2;
-          CGA_SetScale(2);
-          break;
-        }
-
         case IDM_TEXT_CGA:
         {
           WindowTextDisplay = TD_CGA;
@@ -839,7 +814,7 @@ bool T8086TinyInterface_t::Initialise(unsigned char *mem_in)
   AllocConsole();
   freopen("CONOUT$", "wb", stdout);
 
-  printf("8086 tiny starting\n");
+  printf("TinyXT starting\n");
 
   // Store a pointer to system memory
   mem = mem_in;
@@ -883,7 +858,7 @@ bool T8086TinyInterface_t::Initialise(unsigned char *mem_in)
   hwndMain = CreateWindowEx (
           0,                   /* Extended possibilities for variation */
           szClassName,         /* Classname */
-          "8086 Tiny",         /* Title Text */
+          "TinyXT",         /* Title Text */
           WIN_FLAGS,           /* window flags */
           CW_USEDEFAULT,       /* Windows decides the position */
           CW_USEDEFAULT,       /* where the window ends up on the screen */

@@ -32,11 +32,6 @@ IDR_MENU1 MENU
         MENUITEM "Set Serial Ports ...", IDM_SET_SERIAL_PORTS
         MENUITEM "Configure Sound ...", IDM_CONFIGURE_SOUND
         MENUITEM SEPARATOR
-        POPUP "Set Display Scaling"
-        {
-            MENUITEM "x1", IDM_SCALE_X1
-            MENUITEM "x2", IDM_SCALE_X2
-        }
         POPUP "Set Text Display"
         {
             MENUITEM "CGA 8x8", IDM_TEXT_CGA
