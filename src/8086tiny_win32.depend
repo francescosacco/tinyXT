@@ -182,7 +182,7 @@
 
 1511182389 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\resource.h
 
-1511182400 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_8086tiny_interface.cpp
+1511193807 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_8086tiny_interface.cpp
 	"8086tiny_interface.h"
 	"resource.h"
 	<Windows.h>
@@ -197,7 +197,7 @@
 	"win32_sound_cfg.h"
 	"win32_snd_drv.h"
 
-1511184115 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_interface.h
+1511188755 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_interface.h
 	<Windows.h>
 
 1400468036 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\file_dialog.h
@@ -262,17 +262,15 @@
 	"win32_sound_cfg.h"
 	"resource.h"
 
-1511184140 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_new.cpp
+1511280770 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_new.cpp
 	<time.h>
 	<memory.h>
 	<stdio.h>
-	<unistd.h>
-	<fcntl.h>
-	<io.h>
 	<windows.h>
 	<sys/timeb.h>
 	<fcntl.h>
 	<conio.h>
+	<unistd.h>
 	<io.h>
 	"8086tiny_interface.h"
 	"emulator/XTmemory.h"

@@ -26,7 +26,7 @@
 #include "win32_snd_drv.h"
 
 /*  Make the class name into a global variable  */
-char szClassName[ ] = "8086TinyWindowsApp";
+char szClassName[ ] = "TinyXTWindowsApp";
 
 /* The app instance */
 static HINSTANCE MyInstance;
