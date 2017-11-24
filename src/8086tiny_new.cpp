@@ -540,7 +540,6 @@ int main(int argc, char **argv)
           op_from_addr = rm_addr      ;
           op_to_addr   = scratch_uint ;
         }
-      }
 
 				i_reg = stOpcode.extra ;
 
@@ -668,6 +667,7 @@ int main(int argc, char **argv)
 				}
 			;break; case 10: // MOV sreg, r/m | POP r/m | LEA reg, r/m
 				if (!i_w) // MOV
+				{
 					i_w = 1,
 					i_reg += 8,
 
@@ -703,12 +703,13 @@ int main(int argc, char **argv)
             op_from_addr = rm_addr      ;
             op_to_addr   = scratch_uint ;
           }
-        }
 
 					OP(=);
+        }
 				else if (!i_d) // LEA
-					seg_override_en = 1,
-					seg_override = REG_ZERO,
+				{
+					seg_override_en = 1 ;
+					seg_override = REG_ZERO ;
 
           scratch2_uint = 4 * !i_mod ;
           if( i_mod < 3 )
@@ -742,9 +743,10 @@ int main(int argc, char **argv)
             op_from_addr = rm_addr      ;
             op_to_addr   = scratch_uint ;
           }
-        }
+
 
 					R_M_MOV(mem[op_from_addr], rm_addr);
+				}
 				else // POP
 					R_M_POP(mem[rm_addr])
 			;break; case 11: // MOV AL/AX, [loc]
@@ -784,7 +786,7 @@ int main(int argc, char **argv)
           op_from_addr = rm_addr      ;
           op_to_addr   = scratch_uint ;
         }
-      }
+
 
 				MEM_MOV(op_from_addr, op_to_addr)
 			;break; case 12: // ROL|ROR|RCL|RCR|SHL|SHR|???|SAR reg/mem, 1/CL/imm (80186)
@@ -1022,7 +1024,7 @@ int main(int argc, char **argv)
           op_from_addr = rm_addr      ;
           op_to_addr   = scratch_uint ;
         }
-      }
+
 
 				OP(=);
 				MEM_OP(REGS_BASE + stOpcode.extra, =, rm_addr + 2)
