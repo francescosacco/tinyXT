@@ -13,13 +13,6 @@
 #include <Windows.h>
 #endif
 
-// Define INTERCEPT_VMEM if your video card emulation requires
-// intercepting all reads and writes to the video card memory.
-// Intercepting VMEM access will slow things down a little.
-#define INTERCEPT_VMEM
-// Macro to check if an address is in the video memory pages.
-#define IS_VMEM(X) (((X) >= 0xA0000) && ((X) < 0xC0000))
-
 class T8086TinyInterface_t
 {
 public:

@@ -68,8 +68,6 @@
 		<Unit filename="win32/win32_8086tiny_interface.cpp" />
 		<Unit filename="win32/win32_cga.cpp" />
 		<Unit filename="win32/win32_cga.h" />
-		<Unit filename="win32/win32_cpu_speed_dialog.cpp" />
-		<Unit filename="win32/win32_cpu_speed_dialog.h" />
 		<Unit filename="win32/win32_file_dialog.cpp" />
 		<Unit filename="win32/win32_serial_cfg.cpp" />
 		<Unit filename="win32/win32_serial_cfg.h" />

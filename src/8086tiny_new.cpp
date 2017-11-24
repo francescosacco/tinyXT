@@ -142,35 +142,8 @@ T8086TinyInterface_t Interface;
 #define R_M_MOV(dest,src) (i_w ? op_dest = CAST(unsigned short)dest, op_result = CAST(unsigned short)dest = (op_source = CAST(unsigned short)src) \
 								 : (op_dest = dest, op_result = dest = (op_source = CAST(unsigned char)src)))
 
-#ifdef INTERCEPT_VMEM
-
-static unsigned int vmem_src, vmem_dest;
-
-#define MEM_OP(dest,op,src) (IS_VMEM(src) ? \
-                                ( (vmem_src = Interface.VMemRead(i_w, src)), \
-                                  (IS_VMEM(dest) ? \
-                                     (vmem_dest = Interface.VMemRead(i_w, dest), R_M_OP(vmem_dest, op, vmem_src), Interface.VMemWrite(i_w, dest, vmem_dest)) : \
-                                     R_M_OP(mem[dest], op, vmem_src)) ) : \
-                                (IS_VMEM(dest) ? \
-                                   (vmem_dest = Interface.VMemRead(i_w, dest), R_M_OP(vmem_dest, op, mem[src]), Interface.VMemWrite(i_w, dest, vmem_dest)) : \
-                                   R_M_OP(mem[dest], op, mem[src])))
-
-#define MEM_MOV(dest,src) (IS_VMEM(src) ? \
-                             ( (vmem_src = Interface.VMemRead(i_w, src)), \
-                               (IS_VMEM(dest) ? \
-                                  (R_M_MOV(vmem_dest, vmem_src), Interface.VMemWrite(i_w, dest, vmem_dest)) : \
-                                  R_M_MOV(mem[dest], vmem_src)) ) : \
-                             (IS_VMEM(dest) ? \
-                                (R_M_MOV(vmem_dest, mem[src]), Interface.VMemWrite(i_w, dest, vmem_dest)) : \
-                                R_M_MOV(mem[dest], mem[src])))
-
-
-#else
-
 #define MEM_OP(dest,op,src) R_M_OP(mem[dest],op,mem[src])
 #define MEM_MOV(dest, src) R_M_MOV(mem[dest],mem[src])
-
-#endif
 
 #define OP(op) MEM_OP(op_to_addr,op,op_from_addr)
 

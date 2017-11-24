@@ -11,7 +11,6 @@
 #define IDM_QUIT                                40001
 #define IDM_TEXT_CGA                            40004
 #define IDM_TEXT_VGA_8x16                       40005
-#define IDM_SET_SPEED                           40006
 #define IDM_SET_SERIAL_PORTS                    40013
 #define IDM_CONFIGURE_SOUND                     40015
 #define IDC_EDIT_CS                             40101

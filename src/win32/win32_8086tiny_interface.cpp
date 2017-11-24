@@ -22,7 +22,6 @@
 
 #include "win32_cga.h"
 #include "win32_serial_cfg.h"
-#include "win32_cpu_speed_dialog.h"
 #include "win32_sound_cfg.h"
 #include "win32_snd_drv.h"
 
@@ -735,10 +734,6 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
         case IDM_QUIT:
           DestroyWindow(hwnd);
-          break;
-
-        case IDM_SET_SPEED:
-          CPU_SPEED_Dialog(MyInstance, hwnd, CPU_Clock_Hz);
           break;
 
         case IDM_TEXT_CGA:
