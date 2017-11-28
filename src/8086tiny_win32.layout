@@ -2,44 +2,14 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug32" />
-	<File name="win32\win32_8086tiny_interface.cpp" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="706" topLine="47" />
-		</Cursor>
-	</File>
-	<File name="win32\win32_file_dialog.cpp" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="456" topLine="2" />
-		</Cursor>
-	</File>
-	<File name="win32\win32_serial_hw.cpp" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="489" topLine="244" />
-		</Cursor>
-	</File>
-	<File name="shared\file_dialog.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="8086tiny_new.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="24225" topLine="738" />
-		</Cursor>
-	</File>
-	<File name="shared\serial_hw.h" open="0" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="180" />
-		</Cursor>
-	</File>
 	<File name="win32\resource.h" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="540" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="emulator\XTmemory.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="win32\win32_file_dialog.cpp" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="97" topLine="0" />
+			<Cursor1 position="456" topLine="2" />
 		</Cursor>
 	</File>
 	<File name="shared\vga_glyphs.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -57,14 +27,9 @@
 			<Cursor1 position="3931" topLine="202" />
 		</Cursor>
 	</File>
-	<File name="win32\win32_sound_cfg.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="shared\file_dialog.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1066" topLine="8" />
-		</Cursor>
-	</File>
-	<File name="emulator\XTmemory.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="755" topLine="0" />
+			<Cursor1 position="0" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="shared\serial_emulation.cpp" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -72,14 +37,19 @@
 			<Cursor1 position="17532" topLine="76" />
 		</Cursor>
 	</File>
-	<File name="win32\win32_snd_drv.h" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="8086tiny_new.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="11" />
+			<Cursor1 position="5244" topLine="102" />
 		</Cursor>
 	</File>
-	<File name="win32\win32_sound_cfg.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="emulator\XTmemory.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="341" topLine="6" />
+			<Cursor1 position="97" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="emulator\XTmemory.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="755" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="win32\8086tiny_interface_win.rc" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -92,9 +62,34 @@
 			<Cursor1 position="31625" topLine="1320" />
 		</Cursor>
 	</File>
-	<File name="win32\win32_cga.h" open="0" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="win32\win32_snd_drv.h" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3710" topLine="167" />
+			<Cursor1 position="0" topLine="11" />
+		</Cursor>
+	</File>
+	<File name="win32\win32_sound_cfg.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1066" topLine="8" />
+		</Cursor>
+	</File>
+	<File name="win32\win32_serial_hw.cpp" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="489" topLine="244" />
+		</Cursor>
+	</File>
+	<File name="shared\cga_glyphs.cpp" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="292" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="win32\win32_sound_cfg.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="341" topLine="6" />
+		</Cursor>
+	</File>
+	<File name="shared\serial_hw.h" open="0" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="180" />
 		</Cursor>
 	</File>
 	<File name="shared\vga_glyphs.h" open="0" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -102,14 +97,19 @@
 			<Cursor1 position="320" topLine="0" />
 		</Cursor>
 	</File>
+	<File name="win32\win32_cga.h" open="0" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3710" topLine="167" />
+		</Cursor>
+	</File>
+	<File name="win32\win32_8086tiny_interface.cpp" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="706" topLine="47" />
+		</Cursor>
+	</File>
 	<File name="win32\win32_snd_drv.cpp" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="0" topLine="96" />
-		</Cursor>
-	</File>
-	<File name="shared\cga_glyphs.cpp" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="292" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
