@@ -599,7 +599,7 @@ int main(int argc, char **argv)
       i_reg = stOpcode.extra ;
 
     // INC|DEC|JMP|CALL|PUSH
-    case 0x5 :
+    case 0x05 :
       // INC|DEC
       if( i_reg < 2 )
       {
@@ -622,87 +622,149 @@ int main(int argc, char **argv)
         }
 
         // CALL (near or far)
-          if( i_reg & 2 )
-          {
-            R_M_PUSH(reg_ip + 2 + i_mod*(i_mod != 3) + 2*(!i_mod && i_rm == 6)) ;
-          }
-
-          // JMP|CALL (far)
-          if( i_reg & 1 )
-          {
-            (regs16[REG_CS] = *(short*)&mem[op_from_addr + 2]);
-          }
-
-          R_M_OP(reg_ip, =, mem[op_from_addr]);
-          set_opcode(0x9A); // Decode like CALL
-        }
-                else // PUSH
+        if( i_reg & 0x02 )
         {
-                    R_M_PUSH(mem[rm_addr]) ;
+          R_M_PUSH( reg_ip + 2 + i_mod * ( i_mod != 3 ) + 2 * ( !i_mod && i_rm == 6 ) ) ;
         }
-              break ;
 
-      // TEST r/m, imm16 / NOT|NEG|MUL|IMUL|DIV|IDIV reg
-      case 6 :
-                op_to_addr = op_from_addr ;
+        // JMP|CALL (far)
+        if( i_reg & 0x01 )
+        {
+          ( regs16[ REG_CS ] = *( short * )&mem[ op_from_addr + 2 ] ) ;
+        }
 
-                switch( i_reg )
-                {
-                  // TEST
-                    case 0 :
-                      // Decode like AND
-                        set_opcode( 0x20 ) ;
-                        reg_ip += i_w + 1;
-                        R_M_OP( mem[op_to_addr], &, i_data2) ;
-                      break ;
+        R_M_OP( reg_ip , = , mem[ op_from_addr ] ) ;
 
-          // NOT
-          case 2 :
-            MEM_OP(op_to_addr, =~ ,op_from_addr) ;
-                      break ;
+        // Decode like CALL
+        set_opcode( 0x9A ) ;
+      }
+      else // PUSH
+      {
+        R_M_PUSH( mem[ rm_addr ] ) ;
+      }
+      break ;
 
-          // NEG
-          case 3:
-            MEM_OP(op_to_addr, =- ,op_from_addr);
-                        op_dest = 0;
-                        set_opcode(0x28); // Decode like SUB
-                        set_CF(op_result > op_dest);
-                      break;
+    // TEST r/m, imm16 / NOT|NEG|MUL|IMUL|DIV|IDIV reg
+    case 0x06 :
+      op_to_addr = op_from_addr ;
 
-          // MUL
-          case 4:
-                        i_w ? MUL_MACRO(uint16_t, regs16) : MUL_MACRO(uint8_t, regs8) ;
-                      break ;
+      switch( i_reg )
+      {
+      // TEST
+      case 0x00 :
+        // Decode like AND
+        set_opcode( 0x20 ) ;
+        reg_ip += i_w + 1;
+        R_M_OP( mem[ op_to_addr ] , & , i_data2 ) ;
+        break ;
 
-          // IMUL
-          case 5 :
-                        i_w ? MUL_MACRO(short, regs16) : MUL_MACRO(char, regs8)
-                    ;break; case 6: // DIV
-                        i_w ? DIV_MACRO(unsigned short, unsigned, regs16) : DIV_MACRO(uint8_t, unsigned short, regs8)
-                    ;break; case 7: // IDIV
-                        i_w ? DIV_MACRO(short, int, regs16) : DIV_MACRO(char, short, regs8);
-                }
-            ;break; case 7: // ADD|OR|ADC|SBB|AND|SUB|XOR|CMP AL/AX, immed
-                rm_addr = REGS_BASE;
-                i_data2 = i_data0;
-                i_mod = 3;
-                i_reg = stOpcode.extra;
-                reg_ip--;
-            ; case 8: // ADD|OR|ADC|SBB|AND|SUB|XOR|CMP reg, immed
-                op_to_addr = rm_addr;
-                regs16[REG_SCRATCH] = (i_d |= !i_w) ? (char)i_data2 : i_data2;
-                op_from_addr = REGS_BASE + 2 * REG_SCRATCH;
-                reg_ip += !i_d + 1;
-                set_opcode(0x08 * (stOpcode.extra = i_reg));
-            ; case 9: // ADD|OR|ADC|SBB|AND|SUB|XOR|CMP|MOV reg, r/m
-                switch (stOpcode.extra)
-                {
-                    ; case 0: // ADD
-                        MEM_OP(op_to_addr,+=,op_from_addr),
-                        set_CF(op_result < op_dest)
-                    ;break; case 1: // OR
-                        MEM_OP(op_to_addr,|=,op_from_addr);
-                    ;break; case 2: // ADC
+      // NOT
+      case 0x02 :
+        MEM_OP( op_to_addr , =~ , op_from_addr ) ;
+        break ;
+
+      // NEG
+      case 0x03 :
+        MEM_OP( op_to_addr , =- , op_from_addr ) ;
+        op_dest = 0 ;
+
+        // Decode like SUB
+        set_opcode( 0x28 ) ;
+        set_CF( op_result > op_dest ) ;
+        break ;
+
+      // MUL
+      case 0x04 :
+        if( i_w )
+        {
+          MUL_MACRO( uint16_t , regs16 ) ;
+        }
+        else
+        {
+          MUL_MACRO( uint8_t , regs8 ) ;
+        }
+        break ;
+
+      // IMUL
+      case 0x05 :
+        if( i_w )
+        {
+          MUL_MACRO( int16_t , regs16 ) ;
+        }
+        else
+        {
+          MUL_MACRO( int8_t , regs8 ) ;
+        }
+        break ;
+
+      // DIV
+      case 0x06 :
+        if( i_w )
+        {
+          DIV_MACRO( uint16_t , uint32_t , regs16 ) ;
+        }
+        else
+        {
+          DIV_MACRO( uint8_t , uint16_t , regs8 ) ;
+        }
+        break ;
+
+      // IDIV
+      case 0x07 :
+        if( i_w )
+        {
+          DIV_MACRO( int16_t , int32_t , regs16 ) ;
+        }
+        else
+        {
+          DIV_MACRO( char, short, regs8);
+        }
+        break ;
+      }
+      break ;
+
+    // ADD|OR|ADC|SBB|AND|SUB|XOR|CMP AL/AX, immed
+    case 0x07 :
+      rm_addr = REGS_BASE ;
+      i_data2 = i_data0   ;
+      i_mod   = 3         ;
+      i_reg   = stOpcode.extra ;
+      reg_ip-- ;
+
+    // ADD|OR|ADC|SBB|AND|SUB|XOR|CMP reg, immed
+    case 0x08 :
+      op_to_addr = rm_addr ;
+      i_d |= !i_w ;
+      if( i_d )
+      {
+        regs16[ REG_SCRATCH ] = ( char ) i_data2 ;
+      }
+      else
+      {
+        regs16[ REG_SCRATCH ] = i_data2 ;
+      }
+
+      op_from_addr = REGS_BASE + 2 * REG_SCRATCH ;
+      reg_ip += ( !i_d + 1 ) ;
+      stOpcode.extra = i_reg ;
+      set_opcode( 0x08 * i_reg ) ;
+
+    // ADD|OR|ADC|SBB|AND|SUB|XOR|CMP|MOV reg, r/m
+    case 0x09 :
+      switch( stOpcode.extra )
+      {
+        // ADD
+        case 0x00 :
+          MEM_OP( op_to_addr ,+= , op_from_addr ) ;
+          set_CF( op_result < op_dest ) ;
+          break ;
+
+        // OR
+        case 0x01 :
+          MEM_OP( op_to_addr , |= , op_from_addr ) ;
+          break ;
+
+          case 2: // ADC
                         ADC_SBB_MACRO(+)
                     ;break; case 3: // SBB
                         ADC_SBB_MACRO(-) ;
