@@ -139,10 +139,10 @@
 	"win32_sound_cfg.h"
 	"resource.h"
 
-1395021994 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\cga_glyphs.cpp
+1512992254 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\cga_glyphs.cpp
 	"cga_glyphs.h"
 
-1395022004 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\cga_glyphs.h
+1512992254 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\cga_glyphs.h
 
 1397796162 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\debug_disasm.cpp
 	<stdio.h>
@@ -153,7 +153,7 @@
 
 1395021478 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\debug_disasm.h
 
-1509077164 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\serial_emulation.cpp
+1512992254 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\serial_emulation.cpp
 	<winsock2.h>
 	<ws2tcpip.h>
 	<windows.h>
@@ -162,27 +162,27 @@
 	"serial_emulation.h"
 	"serial_hw.h"
 
-1400006662 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\serial_emulation.h
+1512992254 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\serial_emulation.h
 	<windows.h>
 	<stdio.h>
 
-1398980484 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\serial_hw.h
+1512992254 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\serial_hw.h
 
-1397590558 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\vga_glyphs.cpp
+1512992254 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\vga_glyphs.cpp
 	"vga_glyphs.h"
 
-1395765874 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\vga_glyphs.h
+1512992254 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\vga_glyphs.h
 
-1511182216 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\8086tiny_interface_win.rc
+1512992254 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\8086tiny_interface_win.rc
 	<windows.h>
 	<commctrl.h>
 	<richedit.h>
 	<winnt.h>
 	"resource.h"
 
-1511182389 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\resource.h
+1512992254 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\resource.h
 
-1511193807 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_8086tiny_interface.cpp
+1512992254 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_8086tiny_interface.cpp
 	"8086tiny_interface.h"
 	"resource.h"
 	<Windows.h>
@@ -197,14 +197,14 @@
 	"win32_sound_cfg.h"
 	"win32_snd_drv.h"
 
-1511188755 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_interface.h
+1512992254 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_interface.h
 	<Windows.h>
 
-1400468036 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\file_dialog.h
+1512992254 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\shared\file_dialog.h
 
-1511177122 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_cga.h
+1512992254 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_cga.h
 
-1398981586 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_serial_cfg.h
+1512992254 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_serial_cfg.h
 	<windows.h>
 
 1397799300 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_debug.h
@@ -213,14 +213,14 @@
 1399314994 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_cpu_speed_dialog.h
 	<windows.h>
 
-1510941469 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_sound_cfg.h
+1512992254 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_sound_cfg.h
 	<windows.h>
 	<stdio.h>
 
-1399685044 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_snd_drv.h
+1512992254 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_snd_drv.h
 	<windows.h>
 
-1511177114 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_cga.cpp
+1512992254 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_cga.cpp
 	<windows.h>
 	<stdio.h>
 	"win32_cga.h"
@@ -239,30 +239,30 @@
 	"resource.h"
 	"debug_disasm.h"
 
-1400468184 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_file_dialog.cpp
+1512992254 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_file_dialog.cpp
 	"file_dialog.h"
 	<windows.h>
 
-1398982372 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_serial_cfg.cpp
+1512992254 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_serial_cfg.cpp
 	"win32_serial_cfg.h"
 	"serial_emulation.h"
 	"resource.h"
 
-1398979942 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_serial_hw.cpp
+1512992254 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_serial_hw.cpp
 	<windows.h>
 	<stdio.h>
 	"serial_hw.h"
 
-1399686032 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_snd_drv.cpp
+1512992254 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_snd_drv.cpp
 	"win32_snd_drv.h"
 
-1510941431 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_sound_cfg.cpp
+1512992254 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\win32\win32_sound_cfg.cpp
 	<windows.h>
 	<commctrl.h>
 	"win32_sound_cfg.h"
 	"resource.h"
 
-1512962703 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_new.cpp
+1512993319 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\8086tiny_new.cpp
 	<time.h>
 	<memory.h>
 	<stdio.h>
@@ -275,8 +275,8 @@
 	"8086tiny_interface.h"
 	"emulator/XTmemory.h"
 
-1509164467 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\emulator\xtmemory.c
+1512992254 source:c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\emulator\xtmemory.c
 	"XTmemory.h"
 
-1511182553 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\emulator\xtmemory.h
+1512992254 c:\users\francesco\dropbox\projetos\git - tinyxt\tinyxt\src\emulator\xtmemory.h
 
