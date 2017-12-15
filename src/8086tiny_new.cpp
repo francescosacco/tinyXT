@@ -1051,21 +1051,41 @@ int main(int argc, char **argv)
 
         // SHL
         case 0x04 :
-                        set_OF(
-                            (1 & (i_w ? *(int16_t*)&(op_result) : (op_result)) >> (8*(i_w + 1) - 1))
-                            ^ set_CF(
-                                (1 & (i_w ? *(int16_t*)&op_dest << (scratch_uint - 1) : (op_dest << (scratch_uint - 1))) >> (8*(i_w + 1) - 1))
-                                     ))
-                    ;break; case 5: // SHR
-                        set_OF(
-                            (1 & (i_w ? *(int16_t*)&(op_dest) : (op_dest)) >> (8*(i_w + 1) - 1))
-                        )
-                    ;break; case 7: // SAR
-                        scratch_uint < 8*(i_w + 1) || set_CF(scratch2_uint);
-                        set_OF(0);
-                        R_M_OP(mem[rm_addr], +=, scratch2_uint *= ~(((1 << 8*(i_w + 1)) - 1) >> scratch_uint));
-                }
-            ;break; case 13: // LOOPxx|JCZX
+          if( i_w )
+          {
+            set_OF( ( 1 & *( int16_t * )&( op_result ) >> 15 ) ^ set_CF( ( 1 & *( int16_t * )&op_dest << ( scratch_uint - 1 ) ) >> 15 ) ) ;
+          }
+          else
+          {
+            set_OF( ( 1 & op_result >> 7 ) ^ set_CF( ( 1 & ( op_dest << ( scratch_uint - 1 ) ) >> 7 ) ) ) ;
+          }
+          break ;
+
+        // SHR
+        case 0x05 :
+          if( i_w )
+          {
+            set_OF( 1 & *( int16_t * )&( op_dest ) >> 15 ) ;
+          }
+          else
+          {
+            set_OF( ( 1 & ( op_dest ) >> 7 ) ) ;
+          }
+          break ;
+
+        // SAR
+        case 0x07 :
+          if( !( scratch_uint < 8 * ( i_w + 1 ) ) )
+          {
+            set_CF( scratch2_uint ) ;
+          }
+          set_OF( 0 ) ;
+          R_M_OP( mem[ rm_addr ] , += , scratch2_uint *= ~( ( ( 1 << 8*( i_w + 1 ) ) - 1 ) >> scratch_uint ) ) ;
+          break ;
+        }
+        break ;
+
+      case 13: // LOOPxx|JCZX
                 scratch_uint = !!--regs16[REG_CX];
 
                 switch(i_reg4bit)
