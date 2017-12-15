@@ -130,9 +130,6 @@ T8086TinyInterface_t Interface ;
 #define MEM_OP(dest,op,src) R_M_OP(mem[dest],op,mem[src])
 #define MEM_MOV(dest, src) R_M_MOV(mem[dest],mem[src])
 
-// Increment or decrement a register #reg_id (usually SI or DI), depending on direction flag and operand size (given by i_w)
-#define INDEX_INC(reg_id) (regs16[reg_id] -= (2 * regs8[FLAG_DF] - 1)*(i_w + 1))
-
 // Helpers for stack operations
 #define R_M_PUSH(a) (i_w = 1, R_M_OP(mem[SEGREG_OP(REG_SS, REG_SP, --)], =, a))
 #define R_M_POP(a) (i_w = 1, regs16[REG_SP] += 2, R_M_OP(a, =, mem[SEGREG_OP(REG_SS, REG_SP, -2+)]))
@@ -1085,60 +1082,98 @@ int main(int argc, char **argv)
         }
         break ;
 
-      case 13: // LOOPxx|JCZX
-                scratch_uint = !!--regs16[REG_CX];
+      // LOOPxx|JCZX
+      case 0x0D :
+        regs16[ REG_CX ]-- ;
+        scratch_uint = ( regs16[ REG_CX ] ) ? ( XTRUE ) : ( XFALSE ) ;
 
-                switch(i_reg4bit)
-                {
-                    ; case 0: // LOOPNZ
-                        scratch_uint &= !regs8[FLAG_ZF]
-                    ;break; case 1: // LOOPZ
-                        scratch_uint &= regs8[FLAG_ZF]
-                    ;break; case 3: // JCXXZ
-                        scratch_uint = !++regs16[REG_CX];
-                }
-                reg_ip += scratch_uint*(int8_t)i_data0
-            ;break; case 14: // JMP | CALL short/near
-                reg_ip += 3 - i_d;
-                if (!i_w)
-                {
-                    if (i_d) // JMP far
-                        reg_ip = 0,
-                        regs16[REG_CS] = i_data2;
-                    else // CALL
-                        R_M_PUSH(reg_ip);
-                }
-                reg_ip += i_d && i_w ? (int8_t)i_data0 : i_data0
-            ;break; case 15: // TEST reg, r/m
-                MEM_OP(op_from_addr, &, op_to_addr)
-            ;break; case 16: // XCHG AX, regs16
-                i_w = 1;
-                op_to_addr   = REGS_BASE ;
-                op_from_addr = ( REGS_BASE + ( 2 * i_reg4bit ) ) ;
+        switch( i_reg4bit )
+        {
+        // LOOPNZ
+        case 0x00 :
+          scratch_uint &= !regs8[ FLAG_ZF ] ;
+          break ;
 
-            // NOP|XCHG reg, r/m
-            case 24 :
-                if( op_to_addr != op_from_addr )
-                {
-                    MEM_OP( op_to_addr   , ^= , op_from_addr ) ;
-                    MEM_OP( op_from_addr , ^= , op_to_addr   ) ;
-                    MEM_OP( op_to_addr   , ^= , op_from_addr ) ;
-                }
-                break ;
+        // LOOPZ
+        case 0x01 :
+          scratch_uint &= regs8[ FLAG_ZF ] ;
+          break ;
 
-            case 17: // MOVSx (extra=0)|STOSx (extra=1)|LODSx (extra=2)
-                scratch2_uint = seg_override_en ? seg_override : REG_DS;
+        // JCXXZ
+        case 0x03 :
+          scratch_uint = !++regs16[ REG_CX ] ;
+          break ;
+        }
 
-                for (scratch_uint = rep_override_en ? regs16[REG_CX] : 1; scratch_uint; scratch_uint--)
-                {
-                    MEM_MOV(stOpcode.extra < 2 ? SEGREG(REG_ES, REG_DI) : REGS_BASE, stOpcode.extra & 1 ? REGS_BASE : SEGREG(scratch2_uint, REG_SI)),
-                    stOpcode.extra & 1 || INDEX_INC(REG_SI),
-                    stOpcode.extra & 2 || INDEX_INC(REG_DI);
-                }
+        reg_ip += scratch_uint * ( ( int8_t ) i_data0 ) ;
+        break ;
 
-                if (rep_override_en)
-                    regs16[REG_CX] = 0
-            ;break; case 18: // CMPSx (extra=0)|SCASx (extra=1)
+      // JMP | CALL short/near
+      case 0x0E :
+        reg_ip += 3 - i_d ;
+        if( !i_w )
+        {
+          if( i_d ) // JMP far
+          {
+            reg_ip = 0 ;
+            regs16[ REG_CS ] = i_data2 ;
+          }
+          else // CALL
+          {
+            R_M_PUSH( reg_ip ) ;
+          }
+        }
+        reg_ip += ( i_d && i_w ) ? ( ( int8_t ) i_data0 ) : ( i_data0 ) ;
+        break ;
+
+      // TEST reg, r/m
+      case 0x0F :
+        MEM_OP( op_from_addr , & , op_to_addr ) ;
+        break ;
+
+      // XCHG AX, regs16
+      case 0x10 :
+        i_w = 1 ;
+        op_to_addr = REGS_BASE ;
+        op_from_addr = ( REGS_BASE + ( 2 * i_reg4bit ) ) ;
+
+      // NOP|XCHG reg, r/m
+      case 0x18 :
+        if( op_to_addr != op_from_addr )
+        {
+          MEM_OP( op_to_addr   , ^= , op_from_addr ) ;
+          MEM_OP( op_from_addr , ^= , op_to_addr   ) ;
+          MEM_OP( op_to_addr   , ^= , op_from_addr ) ;
+        }
+        break ;
+
+      // MOVSx (extra=0)|STOSx (extra=1)|LODSx (extra=2)
+      case 0x11 :
+        scratch2_uint = ( seg_override_en ) ? ( seg_override     ) : ( REG_DS ) ;
+        scratch_uint  = ( rep_override_en ) ? ( regs16[ REG_CX ] ) : ( 1      ) ;
+
+        for( ; scratch_uint ; scratch_uint-- )
+        {
+          MEM_MOV( ( stOpcode.extra < 2 ) ? SEGREG( REG_ES , REG_DI ) : REGS_BASE , ( stOpcode.extra & 1 ) ? REGS_BASE : SEGREG( scratch2_uint , REG_SI ) ) ;
+          if( ( stOpcode.extra & 0x01 ) == 0x00 )
+          {
+            regs16[ REG_SI ] -= ( 2 * regs8[ FLAG_DF ] - 1 ) * ( i_w + 1 ) ;
+          }
+
+          if( ( stOpcode.extra & 0x02 ) == 0x00 )
+          {
+            regs16[ REG_DI ] -= ( 2 * regs8[ FLAG_DF ] - 1 ) * ( i_w + 1 ) ;
+          }
+        }
+
+        if( rep_override_en )
+        {
+          regs16[ REG_CX ] = 0 ;
+        }
+        break ;
+
+
+      case 18: // CMPSx (extra=0)|SCASx (extra=1)
                 scratch2_uint = seg_override_en ? seg_override : REG_DS;
 
                 if ((scratch_uint = rep_override_en ? regs16[REG_CX] : 1))
@@ -1146,8 +1181,8 @@ int main(int argc, char **argv)
                     for (; scratch_uint; rep_override_en || scratch_uint--)
                     {
                         MEM_OP(stOpcode.extra ? REGS_BASE : SEGREG(scratch2_uint, REG_SI), -, SEGREG(REG_ES, REG_DI)),
-                        stOpcode.extra || INDEX_INC(REG_SI),
-                        INDEX_INC(REG_DI), rep_override_en && !(--regs16[REG_CX] && (!op_result == rep_mode)) && (scratch_uint = 0);
+                        stOpcode.extra || (regs16[ REG_SI ] -= (2 * regs8[FLAG_DF] - 1)*(i_w + 1)),
+                        (regs16[ REG_DI ] -= (2 * regs8[FLAG_DF] - 1)*(i_w + 1)), rep_override_en && !(--regs16[REG_CX] && (!op_result == rep_mode)) && (scratch_uint = 0);
                     }
 
                     stOpcode.set_flags_type = FLAGS_UPDATE_SZP | FLAGS_UPDATE_AO_ARITH; // Funge to set SZP/AO flags
@@ -1385,7 +1420,7 @@ int main(int argc, char **argv)
           }
 
                   R_M_OP(mem[SEGREG(REG_ES, REG_DI)], =, io_ports[scratch_uint]);
-                    INDEX_INC(REG_DI);
+                  (regs16[ REG_DI ] -= (2 * regs8[FLAG_DF] - 1)*(i_w + 1));
                 }
 
                 if (rep_override_en)
@@ -1407,7 +1442,7 @@ int main(int argc, char **argv)
           {
             Interface.WritePort(scratch2_uint+1, io_ports[scratch2_uint+1]);
           }
-                    INDEX_INC(REG_SI);
+                    (regs16[ REG_SI ] -= (2 * regs8[FLAG_DF] - 1)*(i_w + 1));
                 }
 
                 if (rep_override_en)
