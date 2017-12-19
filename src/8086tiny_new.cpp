@@ -1370,14 +1370,22 @@ int main(int argc, char **argv)
         set_flags( op_source ) ;
         break ;
 
-      case 35: // SAHF
-                make_flags();
-                set_flags((scratch_uint & 0xFF00) + regs8[REG_AH])
-            ;break; case 36: // LAHF
-                make_flags(),
-                regs8[REG_AH] = scratch_uint
-            ;break; case 37: // LES|LDS reg, r/m
-                i_w = i_d = 1;
+      // SAHF
+      case 0x23 :
+        make_flags() ;
+        set_flags( (scratch_uint & 0xFF00 ) + regs8[ REG_AH ] ) ;
+        break ;
+
+      // LAHF
+      case 0x24 :
+        make_flags() ;
+        regs8[ REG_AH ] = scratch_uint ;
+        break ;
+
+      // LES|LDS reg, r/m
+      case 0x25 :
+        i_w = 1 ;
+        i_d = 1 ;
 
         scratch2_uint = 4 * !i_mod ;
         if( i_mod < 3 )
@@ -1401,10 +1409,10 @@ int main(int argc, char **argv)
         }
         else
         {
-          rm_addr = (REGS_BASE + (i_w ? 2 * i_rm : (2 * i_rm + i_rm / 4) & 7)) ;
+          rm_addr = ( REGS_BASE + ( 2 * i_rm ) ) ;
         }
         op_to_addr = rm_addr ;
-        op_from_addr = (REGS_BASE + (i_w ? 2 * i_reg : (2 * i_reg + i_reg / 4) & 7));
+        op_from_addr = ( REGS_BASE + ( 2 * i_reg ) ) ;
         if( i_d )
         {
           scratch_uint = op_from_addr ;
@@ -1412,31 +1420,64 @@ int main(int argc, char **argv)
           op_to_addr   = scratch_uint ;
         }
 
-                MEM_OP( op_to_addr , = ,op_from_addr ) ;
-                MEM_OP(REGS_BASE + stOpcode.extra, =, rm_addr + 2)
-            ;break; case 38: // INT 3
-                ++reg_ip;
-                pc_interrupt(3)
-            ;break; case 39: // INT imm8
-                reg_ip += 2;
-                pc_interrupt(i_data0)
-            ;break; case 40: // INTO
-                ++reg_ip;
-                regs8[FLAG_OF] && pc_interrupt(4)
-            ;break; case 41: // AAM;
-                if (i_data0 &= 0xFF)
-                    regs8[REG_AH] = regs8[REG_AL] / i_data0,
-                    op_result = regs8[REG_AL] %= i_data0;
-                else // Divide by zero
-                    pc_interrupt(0);
-            ;break; case 42: // AAD
-                i_w = 0;
-                regs16[REG_AX] = op_result = 0xFF & (regs8[REG_AL] + i_data0 * regs8[REG_AH])
-            ;break; case 43: // SALC
-                regs8[REG_AL] = -regs8[FLAG_CF]
-            ;break; case 44: // XLAT
-                regs8[REG_AL] = mem[SEGREG_OP(seg_override_en ? seg_override : REG_DS, REG_BX, regs8[REG_AL] +)]
-            ;break; case 45: // CMC
+        MEM_OP( op_to_addr                 , = , op_from_addr ) ;
+        MEM_OP( REGS_BASE + stOpcode.extra , = , rm_addr + 2  ) ;
+        break ;
+
+      // INT 3
+      case 0x26 :
+        reg_ip++ ;
+        pc_interrupt( 3 ) ;
+        break ;
+
+      // INT imm8
+      case 0x27 :
+        reg_ip += 2 ;
+        pc_interrupt( ( uint8_t ) i_data0 ) ;
+        break ;
+
+      // INTO
+      case 0x28 :
+        reg_ip++ ;
+        if( regs8[ FLAG_OF ] )
+        {
+          pc_interrupt( 4 ) ;
+        }
+        break ;
+
+      // AAM
+      case 0x29 :
+        i_data0 &= 0xFF ;
+        if( i_data0 )
+        {
+          regs8[ REG_AH ] = regs8[ REG_AL ] / i_data0 ;
+          regs8[ REG_AL ] %= i_data0 ;
+          op_result = regs8[ REG_AL ] ;
+        }
+        else // Divide by zero
+        {
+          pc_interrupt( 0 ) ;
+        }
+        break ;
+
+      // AAD
+      case 0x2A :
+        i_w = 0 ;
+        op_result = 0xFF & ( regs8[ REG_AL ] + i_data0 * regs8[ REG_AH ] ) ;
+        regs16[ REG_AX ] = op_result ;
+        break ;
+
+      // SALC
+      case 0x2B :
+        regs8[ REG_AL ] = -regs8[ FLAG_CF ] ;
+        break ;
+
+      // XLAT
+      case 0x2C :
+        regs8[ REG_AL ] = mem[ SEGREG_OP( seg_override_en ? seg_override : REG_DS , REG_BX,  regs8[ REG_AL ] + ) ] ;
+        break ;
+
+      case 45: // CMC
                 regs8[FLAG_CF] ^= 1
             ;break; case 46: // CLC|STC|CLI|STI|CLD|STD
                 regs8[stOpcode.extra / 2] = stOpcode.extra & 1
