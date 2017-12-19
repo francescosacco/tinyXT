@@ -1271,35 +1271,106 @@ int main(int argc, char **argv)
         }
         break ;
 
-      case 25: // PUSH reg
-                R_M_PUSH(regs16[stOpcode.extra])
-            ;break; case 26: // POP reg
-                R_M_POP(regs16[stOpcode.extra])
-            ;break; case 27: // xS: segment overrides
-                seg_override_en = 2;
-                seg_override = stOpcode.extra;
-                rep_override_en && rep_override_en++
-            ;break; case 28: // DAA/DAS
-                i_w = 0;
-        // extra = 0 for DAA, 1 for DAS
-                if (stOpcode.extra) DAA_DAS(-=, >); else DAA_DAS(+=, <)
-            ;break; case 29: // AAA/AAS
-                op_result = AAA_AAS(stOpcode.extra - 1)
-            ;break; case 30: // CBW
-                regs8[REG_AH] = -( (1 & (i_w ? *(int16_t*)&(regs8[REG_AL]) : (regs8[REG_AL])) >> (8*(i_w + 1) - 1)) )
-            ;break; case 31: // CWD
-                regs16[REG_DX] = -( (1 & (i_w ? *(int16_t*)&(regs16[REG_AX]) : (regs16[REG_AX])) >> (8*(i_w + 1) - 1)) )
-            ;break; case 32: // CALL FAR imm16:imm16
-                R_M_PUSH(regs16[REG_CS]);
-                R_M_PUSH(reg_ip + 5);
-                regs16[REG_CS] = i_data2;
-                reg_ip = i_data0
-            ;break; case 33: // PUSHF
-                make_flags();
-                R_M_PUSH(scratch_uint)
-            ;break; case 34: // POPF
-                set_flags(R_M_POP(scratch_uint))
-            ;break; case 35: // SAHF
+      // PUSH reg
+      case 0x19 :
+        R_M_PUSH( regs16[ stOpcode.extra ] ) ;
+        break ;
+
+      // POP reg
+      case 0x1A :
+        R_M_POP( regs16[ stOpcode.extra ] ) ;
+        break ;
+
+      // xS: segment overrides
+      case 0x1B :
+        seg_override_en = 2 ;
+        seg_override = stOpcode.extra ;
+        if( rep_override_en )
+        {
+          rep_override_en++ ;
+        }
+        break ;
+
+      // DAA/DAS
+      case 0x1C :
+        i_w = 0 ;
+        if( stOpcode.extra )
+        {
+          // extra = 1 for DAS.
+          DAA_DAS( -= , > ) ;
+        }
+        else
+        {
+          // extra = 0 for DAA.
+          DAA_DAS( += , < ) ;
+        }
+        break ;
+
+      // AAA/AAS
+      case 0x1D :
+        op_result = AAA_AAS( stOpcode.extra - 1 ) ;
+        break ;
+
+      // CBW
+      case 0x1E :
+        if( i_w )
+        {
+          regs8[ REG_AH ] = -( 1 & *( int16_t * )&( regs8[ REG_AL ] ) >> 15 ) ;
+        }
+        else
+        {
+          regs8[ REG_AH ] = -( 1 & regs8[ REG_AL ] >> 7 ) ;
+        }
+        break ;
+
+      // CWD
+      case 0x1F :
+        if( i_w )
+        {
+          regs16[ REG_DX ] = -( 1 & *( int16_t * )&( regs16[ REG_AX ] ) >> 15 ) ;
+        }
+        else
+        {
+          regs16[ REG_DX ] = -( 1 & regs16[ REG_AX ] >> 7 ) ;
+        }
+        break ;
+
+      // CALL FAR imm16:imm16
+      case 0x20 :
+        R_M_PUSH( regs16[ REG_CS ] ) ;
+        R_M_PUSH( reg_ip + 5 ) ;
+        regs16[ REG_CS ] = i_data2 ;
+        reg_ip = i_data0 ;
+        break ;
+
+      // PUSHF
+      case 0x21 :
+        make_flags() ;
+        R_M_PUSH( scratch_uint ) ;
+        break ;
+
+      // POPF
+      case 0x22 :
+        i_w = 1 ;
+        regs16[ REG_SP ] += 2 ;
+        op_dest = *( uint16_t * )&scratch_uint ;
+
+        {
+          uint16_t aux ;
+          aux = regs16[ REG_SS ] ;
+          aux *= 16 ;
+          aux += ( uint16_t ) regs16[ REG_SP ] ;
+          aux -= 2 ;
+
+          op_source = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ;
+        }
+
+        op_result = op_source ;
+        *( uint16_t * )&scratch_uint = op_source ;
+        set_flags( op_source ) ;
+        break ;
+
+      case 35: // SAHF
                 make_flags();
                 set_flags((scratch_uint & 0xFF00) + regs8[REG_AH])
             ;break; case 36: // LAHF
