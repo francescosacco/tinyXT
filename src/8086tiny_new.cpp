@@ -1477,45 +1477,75 @@ int main(int argc, char **argv)
         regs8[ REG_AL ] = mem[ SEGREG_OP( seg_override_en ? seg_override : REG_DS , REG_BX,  regs8[ REG_AL ] + ) ] ;
         break ;
 
-      case 45: // CMC
-                regs8[FLAG_CF] ^= 1
-            ;break; case 46: // CLC|STC|CLI|STI|CLD|STD
-                regs8[stOpcode.extra / 2] = stOpcode.extra & 1
-            ;break; case 47: // TEST AL/AX, immed
-                R_M_OP(regs8[REG_AL], &, i_data0)
-      ;break; case 48: // LOCK:
-      ;break; case 49: // HLT
-            ;break;
+      // CMC
+      case 0x2D :
+        regs8[ FLAG_CF ] ^= 1 ;
+        break ;
 
-            // Emulator-specific 0F xx opcodes
-            case 50 :
-                switch( ( int8_t ) i_data0 )
-                {
-                  // PUTCHAR_AL.
-                    case 0 :
-                      //write(1, regs8, 1)
-                        putchar( regs8[ 0 ] ) ;
-                      break ;
+      // CLC|STC|CLI|STI|CLD|STD
+      case 0x2E :
+        regs8[ stOpcode.extra / 2 ] = stOpcode.extra & 0x01 ;
+        break ;
 
-          // GET_RTC
-          case 1:
-                        time( &clock_buf ) ;
-                        ftime( &ms_clock ) ;
-                        memcpy( mem + SEGREG(REG_ES, REG_BX), localtime(&clock_buf), sizeof(struct tm));
-                        *(int16_t*)&mem[SEGREG_OP(REG_ES, REG_BX, 36+)] = ms_clock.millitm;
-                      break ;
+      // TEST AL/AX, immed
+      case 0x2F :
+        R_M_OP( regs8[ REG_AL ] , & , i_data0 ) ;
+        break ;
 
-          // DISK_READ
-          case 2 :
-          // DISK_WRITE
-                    case 3 :
-                        regs8[ REG_AL ] = ~lseek( disk[ regs8[ REG_DL ] ] , *(unsigned*)&regs16[REG_BP] << 9 , 0 ) ?
-              ((int8_t)i_data0 == 3 ? (int(*)(int, const void *, int))write :(int(*)(int, const void *, int))read)(disk[regs8[REG_DL]], mem + SEGREG(REG_ES, REG_BX), regs16[REG_AX])
-                            : 0;
-                }
-      ;break; case 51: // 80186, NEC V20: ENTER
-        // i_data0 = locals
-        // LSB(i_data2)  = lex level
+      // LOCK
+      case 0x30 :
+        break ;
+
+      // HLT
+      case 0x31 :
+        break ;
+
+      // Emulator-specific 0F xx opcodes
+      case 0x32 :
+        switch( ( int8_t ) i_data0 )
+        {
+        // PUTCHAR_AL.
+        case 0x00 :
+          putchar( regs8[ 0 ] ) ;
+          break ;
+
+        // GET_RTC
+        case 0x01 :
+          time( &clock_buf ) ;
+          ftime( &ms_clock ) ;
+          memcpy( mem + SEGREG( REG_ES , REG_BX ) , localtime( &clock_buf ) , sizeof( struct tm ) ) ;
+          *( int16_t * )&mem[ SEGREG_OP( REG_ES , REG_BX , 36+ ) ] = ms_clock.millitm ;
+          break ;
+
+        // DISK_READ
+        case 0x02 :
+        // DISK_WRITE
+        case 0x03 :
+          {
+            long seekRet ;
+
+            seekRet = ~lseek( disk[ regs8[ REG_DL ] ] , *( uint32_t * )&regs16[ REG_BP ] << 9 , 0 ) ;
+            if( seekRet )
+            {
+              if( ( ( int8_t ) i_data0 ) == 3 )
+              {
+                regs8[ REG_AL ] = write( disk[ regs8[ REG_DL ] ] , mem + SEGREG( REG_ES , REG_BX ) , regs16[ REG_AX ] ) ;
+              }
+              else
+              {
+                regs8[ REG_AL ] = read( disk[ regs8[ REG_DL ] ] , mem + SEGREG( REG_ES , REG_BX ) , regs16[ REG_AX ] ) ;
+              }
+            }
+            else
+            {
+              regs8[ REG_AL ] = 0 ;
+            }
+          }
+          break ;
+        }
+        break ;
+
+      case 51: // 80186, NEC V20: ENTER
         R_M_PUSH(regs16[REG_BP]);
         scratch_uint = regs16[REG_SP];
         scratch2_uint = i_data2 &= 0x00ff;
