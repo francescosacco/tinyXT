@@ -1172,56 +1172,106 @@ int main(int argc, char **argv)
         }
         break ;
 
-
-      case 18: // CMPSx (extra=0)|SCASx (extra=1)
-                scratch2_uint = seg_override_en ? seg_override : REG_DS;
-
-                if ((scratch_uint = rep_override_en ? regs16[REG_CX] : 1))
-                {
-                    for (; scratch_uint; rep_override_en || scratch_uint--)
-                    {
-                        MEM_OP(stOpcode.extra ? REGS_BASE : SEGREG(scratch2_uint, REG_SI), -, SEGREG(REG_ES, REG_DI)),
-                        stOpcode.extra || (regs16[ REG_SI ] -= (2 * regs8[FLAG_DF] - 1)*(i_w + 1)),
-                        (regs16[ REG_DI ] -= (2 * regs8[FLAG_DF] - 1)*(i_w + 1)), rep_override_en && !(--regs16[REG_CX] && (!op_result == rep_mode)) && (scratch_uint = 0);
-                    }
-
-                    stOpcode.set_flags_type = FLAGS_UPDATE_SZP | FLAGS_UPDATE_AO_ARITH; // Funge to set SZP/AO flags
-                    set_CF(op_result > op_dest);
-                }
-            ;break; case 19: // RET|RETF|IRET
-                i_d = i_w;
-                R_M_POP(reg_ip);
-                if (stOpcode.extra) // IRET|RETF|RETF imm16
-                    R_M_POP(regs16[REG_CS]);
-                if (stOpcode.extra & 2) // IRET
-                    set_flags(R_M_POP(scratch_uint));
-                else if (!i_d) // RET|RETF imm16
-                  regs16[REG_SP] += i_data0
-            ;break; case 20: // MOV r/m, immed
-        //R_M_OP(mem[op_from_addr], =, i_data2)
-        regs16[REG_TMP] = i_data2;
-        MEM_MOV(op_from_addr, REGS_BASE + REG_TMP * 2)
-          ;break; case 21: // IN AL/AX, DX/imm8
-                scratch_uint = stOpcode.extra ? regs16[REG_DX] : (uint8_t)i_data0;
-        io_ports[scratch_uint] = Interface.ReadPort(scratch_uint);
-                if (i_w)
+      // CMPSx (extra=0)|SCASx (extra=1)
+      case 0x12 :
+        scratch2_uint = ( seg_override_en ) ? ( seg_override     ) : ( REG_DS ) ;
+        scratch_uint  = ( rep_override_en ) ? ( regs16[ REG_CX ] ) : ( 1      ) ;
+        if( scratch_uint )
         {
-          io_ports[scratch_uint+1] = Interface.ReadPort(scratch_uint+1);
+          while( scratch_uint )
+          {
+            MEM_OP( stOpcode.extra ? REGS_BASE : SEGREG( scratch2_uint , REG_SI ) , - , SEGREG( REG_ES , REG_DI ) ) ;
+
+            if( !stOpcode.extra )
+            {
+              regs16[ REG_SI ] -= ( 2 * regs8[ FLAG_DF ] - 1 ) * ( i_w + 1 ) ;
+            }
+
+            regs16[ REG_DI ] -= ( 2 * regs8[ FLAG_DF ] - 1 ) * ( i_w + 1 ) ;
+
+            if( rep_override_en )
+            {
+              regs16[ REG_CX ]-- ;
+              if( !( regs16[ REG_CX ] && ( !op_result == rep_mode ) ) )
+              {
+                scratch_uint = 0 ;
+              }
+            }
+
+            if( !rep_override_en )
+            {
+              scratch_uint-- ;
+            }
+          }
+
+          // Funge to set SZP/AO flags.
+          stOpcode.set_flags_type = ( FLAGS_UPDATE_SZP | FLAGS_UPDATE_AO_ARITH ) ;
+          set_CF( op_result > op_dest ) ;
         }
-                R_M_OP(regs8[REG_AL], =, io_ports[scratch_uint]);
-            ;break; case 22: // OUT DX/imm8, AL/AX
-              scratch_uint = stOpcode.extra ? regs16[REG_DX] : (uint8_t)i_data0;
-                R_M_OP(io_ports[scratch_uint], =, regs8[REG_AL]);
-        Interface.WritePort(scratch_uint, io_ports[scratch_uint]);
-        if (i_w)
+        break ;
+
+      // RET|RETF|IRET
+      case 0x13 :
+        i_d = i_w ;
+        R_M_POP( reg_ip ) ;
+
+        // IRET|RETF|RETF imm16
+        if( stOpcode.extra )
         {
-          Interface.WritePort(scratch_uint+1, io_ports[scratch_uint+1]);
+          R_M_POP( regs16[ REG_CS ] ) ;
         }
-            ;break; case 23: // REPxx
-                rep_override_en = 2;
-                rep_mode = i_w;
-                seg_override_en && seg_override_en++
-            ;break; case 25: // PUSH reg
+
+        if( stOpcode.extra & 0x02 )// IRET
+        {
+          set_flags( R_M_POP( scratch_uint ) ) ;
+        }
+        else if( !i_d ) // RET|RETF imm16
+        {
+          regs16[ REG_SP ] += i_data0 ;
+        }
+        break ;
+
+      // MOV r/m, immed
+      case 0x14 :
+        regs16[ REG_TMP ] = i_data2 ;
+        MEM_MOV( op_from_addr , REGS_BASE + REG_TMP * 2 ) ;
+        break ;
+
+      // IN AL/AX, DX/imm8
+      case 0x15 :
+        scratch_uint = ( stOpcode.extra ) ? ( regs16[ REG_DX ] ) : ( ( uint8_t ) i_data0 ) ;
+        io_ports[ scratch_uint ] = Interface.ReadPort( scratch_uint ) ;
+
+        if( i_w )
+        {
+          io_ports[ scratch_uint + 1 ] = Interface.ReadPort( scratch_uint + 1 ) ;
+        }
+        R_M_OP( regs8[ REG_AL ] , = , io_ports[ scratch_uint ] ) ;
+        break ;
+
+      // OUT DX/imm8, AL/AX
+      case 0x16 :
+        scratch_uint = ( stOpcode.extra ) ? ( regs16[ REG_DX ] ) : ( ( uint8_t ) i_data0 ) ;
+        R_M_OP( io_ports[ scratch_uint ] , = , regs8[ REG_AL ] ) ;
+        Interface.WritePort( scratch_uint , io_ports[ scratch_uint ] ) ;
+        if( i_w )
+        {
+          Interface.WritePort( scratch_uint + 1 , io_ports[ scratch_uint + 1 ] ) ;
+        }
+        break ;
+
+      // REPxx
+      case 0x17 :
+        rep_override_en = 2   ;
+        rep_mode        = i_w ;
+
+        if( seg_override_en )
+        {
+          seg_override_en++ ;
+        }
+        break ;
+
+      case 25: // PUSH reg
                 R_M_PUSH(regs16[stOpcode.extra])
             ;break; case 26: // POP reg
                 R_M_POP(regs16[stOpcode.extra])
