@@ -107,10 +107,6 @@ T8086TinyInterface_t Interface ;
 // Helper macros
 
 // [I]MUL/[I]DIV/DAA/DAS/ADC/SBB helpers
-#define MUL_MACRO(op_data_type,out_regs) (set_opcode(0x10), \
-                                          out_regs[i_w + 1] = (op_result = *(op_data_type*)&mem[rm_addr] * (op_data_type)*out_regs) >> 16, \
-                                          regs16[REG_AX] = op_result, \
-                                          set_OF(set_CF(op_result - (op_data_type)op_result)))
 #define DIV_MACRO(out_data_type,in_data_type,out_regs) (scratch_int = *(out_data_type*)&mem[rm_addr]) && !(scratch2_uint = (in_data_type)(scratch_uint = (out_regs[i_w+1] << 16) + regs16[REG_AX]) / scratch_int, scratch2_uint - (out_data_type)scratch2_uint) ? out_regs[i_w+1] = scratch_uint - scratch_int * (*out_regs = scratch2_uint) : pc_interrupt(0)
 #define DAA_DAS(op1,op2) \
                   set_AF((((scratch_uchar = regs8[REG_AL]) & 0x0F) > 9) || regs8[FLAG_AF]) && (op_result = (regs8[REG_AL] op1 6), set_CF(regs8[FLAG_CF] || (regs8[REG_AL] op2 scratch_uchar))), \
@@ -707,11 +703,33 @@ int main(int argc, char **argv)
     case 0x05 :
       if( i_w )
       {
-        MUL_MACRO( int16_t , regs16 ) ;
+        int8_t flagRet ;
+
+        set_opcode( 0x10 ) ;
+
+        op_result  = ( int16_t ) regs16[ 0 ] ;
+        op_result *= *( int16_t * ) &mem[ rm_addr ] ;
+
+        regs16[ i_w + 1 ] = op_result >> 16 ;
+        regs16[ REG_AX  ] = op_result ;
+
+        flagRet = set_CF( op_result - ( int16_t ) op_result ) ;
+        set_OF( flagRet ) ;
       }
       else
       {
-        MUL_MACRO( int8_t , regs8 ) ;
+        int8_t flagRet ;
+
+        set_opcode( 0x10 ) ;
+
+        op_result  = ( int8_t ) regs8[ 0 ] ;
+        op_result *= *( int8_t * ) &mem[ rm_addr ] ;
+
+        regs8[ i_w + 1 ] = op_result >> 16 ;
+        regs16[ REG_AX ] = op_result ;
+
+        flagRet = set_CF( op_result - ( int8_t ) op_result ) ;
+        set_OF( flagRet ) ;
       }
       break ;
 
