@@ -127,8 +127,6 @@ T8086TinyInterface_t Interface ;
 #define R_M_MOV(dest,src) (i_w ? op_dest = *(uint16_t*)&dest, op_result = *(uint16_t*)&dest = (op_source = *(uint16_t*)&src) \
                                  : (op_dest = dest, op_result = dest = (op_source = *(uint8_t*)&src)))
 
-#define MEM_MOV(dest, src) R_M_MOV(mem[dest],mem[src])
-
 // Helpers for stack operations
 #define R_M_PUSH(a) (i_w = 1, R_M_OP(mem[SEGREG_OP(REG_SS, REG_SP, --)], =, a))
 #define R_M_POP(a) (i_w = 1, regs16[REG_SP] += 2, R_M_OP(a, =, mem[SEGREG_OP(REG_SS, REG_SP, -2+)]))
@@ -797,7 +795,7 @@ int main(int argc, char **argv)
 
       // MOV
       case 0x08 :
-        MEM_MOV( op_to_addr , op_from_addr ) ;
+        R_M_MOV( mem[ op_to_addr ] , mem[ op_from_addr ] ) ;
         break ;
       }
       break ;
@@ -931,7 +929,7 @@ int main(int argc, char **argv)
         op_to_addr   = scratch_uint ;
       }
 
-      MEM_MOV( op_from_addr , op_to_addr ) ;
+      R_M_MOV( mem[ op_from_addr ] , mem[ op_to_addr ] ) ;
       break ;
 
     // ROL|ROR|RCL|RCR|SHL|SHR|???|SAR reg/mem, 1/CL/imm (80186)
@@ -1159,7 +1157,7 @@ int main(int argc, char **argv)
 
       for( ; scratch_uint ; scratch_uint-- )
       {
-        MEM_MOV( ( stOpcode.extra < 2 ) ? SEGREG( REG_ES , REG_DI ) : REGS_BASE , ( stOpcode.extra & 1 ) ? REGS_BASE : SEGREG( scratch2_uint , REG_SI ) ) ;
+        R_M_MOV( mem[ ( stOpcode.extra < 2 ) ? SEGREG( REG_ES , REG_DI ) : REGS_BASE ] , mem[ ( stOpcode.extra & 1 ) ? REGS_BASE : SEGREG( scratch2_uint , REG_SI ) ] ) ;
         if( ( stOpcode.extra & 0x01 ) == 0x00 )
         {
           regs16[ REG_SI ] -= ( 2 * regs8[ FLAG_DF ] - 1 ) * ( i_w + 1 ) ;
@@ -1239,7 +1237,7 @@ int main(int argc, char **argv)
     // MOV r/m, immed
     case 0x14 :
       regs16[ REG_TMP ] = i_data2 ;
-      MEM_MOV( op_from_addr , REGS_BASE + REG_TMP * 2 ) ;
+      R_M_MOV( mem[ op_from_addr ] , mem[ REGS_BASE + REG_TMP * 2 ] ) ;
       break ;
 
     // IN AL/AX, DX/imm8
