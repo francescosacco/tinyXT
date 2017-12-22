@@ -119,8 +119,8 @@ T8086TinyInterface_t Interface ;
                                  : (op_dest = dest, op_result = dest op (op_source = *(uint8_t*)&src)))
 
 // Helpers for stack operations
-#define R_M_PUSH(a) (i_w = 1, R_M_OP(mem[SEGREG_OP(REG_SS, REG_SP, --)], =, a))
-#define R_M_POP(a) (i_w = 1, regs16[REG_SP] += 2, R_M_OP(a, =, mem[SEGREG_OP(REG_SS, REG_SP, -2+)]))
+#define R_M_PUSH(a) (i_w = 1, R_M_OP(mem[16 * regs16[REG_SS] + (uint16_t)(--regs16[REG_SP])], =, a))
+#define R_M_POP(a) (i_w = 1, regs16[REG_SP] += 2, R_M_OP(a, =, mem[16 * regs16[REG_SS] + (uint16_t)(-2+ regs16[REG_SP])]))
 
 // Convert segment:offset to linear address in emulator memory space
 #define SEGREG_OP(reg_seg,reg_ofs,op) 16 * regs16[reg_seg] + (uint16_t)(op regs16[reg_ofs])
@@ -1036,7 +1036,7 @@ int main(int argc, char **argv)
       {
         i_w = 1 ;
         regs16[ REG_SP ] += 2 ;
-        R_M_OP( mem[ rm_addr ] , =, mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
+        R_M_OP( mem[ rm_addr ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ) ;
       }
       break ;
 
@@ -1129,12 +1129,12 @@ int main(int argc, char **argv)
       else if( i_d )
       {
         // xxx reg/mem, CL
-        scratch_uint = 31 & regs8[REG_CL] ;
+        scratch_uint = 0x1F & regs8[ REG_CL ] ;
       }
       else
       {
         // xxx reg/mem, 1
-        scratch_uint = 1 ;
+        scratch_uint = 0x01 ;
       }
 
       if( scratch_uint )
@@ -1299,6 +1299,7 @@ int main(int argc, char **argv)
           R_M_PUSH( reg_ip ) ;
         }
       }
+
       reg_ip += ( i_d && i_w ) ? ( ( int8_t ) i_data0 ) : ( i_data0 ) ;
       break ;
 
@@ -1363,7 +1364,7 @@ int main(int argc, char **argv)
           aux = *( uint8_t * )&( mem[ ( stOpcode.extra & 1 ) ? REGS_BASE : addrSrc ] ) ;
           op_source = aux ;
           op_result = aux ;
-          ( mem[ ( stOpcode.extra < 2 ) ? addrDst : REGS_BASE ] ) = aux ;
+          mem[ ( stOpcode.extra < 2 ) ? addrDst : REGS_BASE ] = aux ;
         }
 
         if( ( stOpcode.extra & 0x01 ) == 0x00 )
@@ -1440,21 +1441,21 @@ int main(int argc, char **argv)
       i_d = i_w ;
       i_w = 1 ;
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( reg_ip , = , mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
+      R_M_OP( reg_ip , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ) ;
 
       // IRET|RETF|RETF imm16
       if( stOpcode.extra )
       {
         i_w = 1 ;
         regs16[ REG_SP ] += 2 ;
-        R_M_OP( regs16[ REG_CS ] , = , mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
+        R_M_OP( regs16[ REG_CS ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ) ;
       }
 
       if( stOpcode.extra & 0x02 )// IRET
       {
         i_w = 1 ;
         regs16[ REG_SP ] += 2 ;
-        set_flags( R_M_OP( scratch_uint , = , mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ) ;
+        set_flags( R_M_OP( scratch_uint , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ) ) ;
       }
       else if( !i_d ) // RET|RETF imm16
       {
