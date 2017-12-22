@@ -156,7 +156,7 @@ uint32_t op_from_addr   ;
 uint32_t scratch_uint   ;
 uint32_t scratch2_uint  ;
 
-int i_data1r, op_result, disk[3], scratch_int;
+int i_data1r , op_result , disk[ 3 ] , scratch_int ;
 
 uint16_t * regs16       ;
 uint16_t   reg_ip       ;
@@ -197,7 +197,7 @@ int8_t set_CF( int new_CF )
 }
 
 // Set auxiliary flag
-int8_t set_AF(int new_AF)
+int8_t set_AF( int new_AF )
 {
   uint8_t reg ;
 
@@ -271,7 +271,7 @@ void set_opcode( uint8_t opcode )
   stOpcode.xlat_opcode_id = bios_table_lookup[ TABLE_XLAT_OPCODE      ][ opcode ] ;
   stOpcode.extra          = bios_table_lookup[ TABLE_XLAT_SUBFUNCTION ][ opcode ] ;
   stOpcode.i_mod_size     = bios_table_lookup[ TABLE_I_MOD_SIZE       ][ opcode ] ;
-  stOpcode.set_flags_type = bios_table_lookup[ TABLE_STD_FLAGS        ][ opcode ];
+  stOpcode.set_flags_type = bios_table_lookup[ TABLE_STD_FLAGS        ][ opcode ] ;
 }
 
 // Execute INT #interrupt_num on the emulated machine
@@ -372,7 +372,7 @@ int main(int argc, char **argv)
 #if defined(_WIN32)
   Interface.SetInstance(hInstance);
 #endif
-  Interface.Initialise(mem);
+  Interface.Initialise( mem ) ;
 
   // regs16 and reg8 point to F000:0, the start of memory-mapped registers
   regs8  = ( uint8_t  * ) ( mem + REGS_BASE ) ;
@@ -384,10 +384,10 @@ int main(int argc, char **argv)
   disk[ 2 ] = 0 ;
 
   // Reset, loads initial disk and bios images, clears RAM and sets CS & IP.
-  Reset();
+  Reset() ;
 
   // Instruction execution loop.
-  bool ExitEmulation = false;
+  bool ExitEmulation = false ;
   while( !ExitEmulation )
   {
     opcode_stream = mem + 16 * regs16[ REG_CS ] + reg_ip ;
@@ -516,21 +516,20 @@ int main(int argc, char **argv)
 
   // MOV reg, imm
   case 0x01 :
-    if( stOpcode.raw_opcode_id & 8 )
+    i_w = ( stOpcode.raw_opcode_id & 8 ) ? ( XTRUE ) : ( XFALSE ) ;
+    if( i_w )
     {
-      i_w = 1 ;
-      *(uint16_t*)&op_dest   = *(uint16_t*)&mem[ REGS_BASE + ( 2 * i_reg4bit ) ] ;
-      *(uint16_t*)&op_source = *(uint16_t*)&i_data0 ;
-      *(uint16_t*)&op_result = *(uint16_t*)&i_data0 ;
-      *(uint16_t*)&mem[ REGS_BASE + ( 2 * i_reg4bit ) ] = *(uint16_t*)&i_data0 ;
+      *( uint16_t * )&op_dest   = *(uint16_t*)&mem[ REGS_BASE + ( 2 * i_reg4bit ) ] ;
+      *( uint16_t * )&op_source = *(uint16_t*)&i_data0 ;
+      *( uint16_t * )&op_result = *(uint16_t*)&i_data0 ;
+      *( uint16_t * )&mem[ REGS_BASE + ( 2 * i_reg4bit ) ] = *(uint16_t*)&i_data0 ;
     }
     else
     {
-      i_w = 0 ;
-      *(uint8_t*)&op_dest   = *(uint8_t*)&mem[ REGS_BASE + ( ( 2 * i_reg4bit + i_reg4bit / 4 ) & 0x07 ) ] ;
-      *(uint8_t*)&op_source = *(uint8_t*)&i_data0 ;
-      *(uint8_t*)&op_result = *(uint8_t*)&i_data0 ;
-      *(uint8_t*)&mem[ REGS_BASE + ( ( 2 * i_reg4bit + i_reg4bit / 4 ) & 0x07 ) ] = *(uint8_t*)&i_data0 ;
+      *( uint8_t * )&op_dest   = *(uint8_t*)&mem[ REGS_BASE + ( ( 2 * i_reg4bit + i_reg4bit / 4 ) & 0x07 ) ] ;
+      *( uint8_t * )&op_source = *(uint8_t*)&i_data0 ;
+      *( uint8_t * )&op_result = *(uint8_t*)&i_data0 ;
+      *( uint8_t * )&mem[ REGS_BASE + ( ( 2 * i_reg4bit + i_reg4bit / 4 ) & 0x07 ) ] = *(uint8_t*)&i_data0 ;
     }
     break ;
 
@@ -548,7 +547,7 @@ int main(int argc, char **argv)
     i_w = 1 ;
     regs16[ REG_SP ] += 2 ;
     op_dest   = *( uint16_t * ) &regs16[ i_reg4bit ] ;
-    op_source = *( uint16_t * ) &(mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( - 2 + regs16[ REG_SP ] ) ]) ;
+    op_source = *( uint16_t * ) &( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( - 2 + regs16[ REG_SP ] ) ] ) ;
     op_result = op_source ;
     *( uint16_t * ) &regs16[ i_reg4bit ] = op_source ;
     break ;
@@ -581,10 +580,10 @@ int main(int argc, char **argv)
     }
     else
     {
-      rm_addr = ( REGS_BASE + ( i_w ? ( 2 * i_rm ) : ( 2 * i_rm + i_rm / 4 ) & 7 ) ) ;
+      rm_addr = ( REGS_BASE + ( ( i_w ) ? ( 2 * i_rm ) : ( 2 * i_rm + i_rm / 4 ) & 7 ) ) ;
     }
     op_to_addr = rm_addr ;
-    op_from_addr = (REGS_BASE + ( i_w ? ( 2 * i_reg ) : ( 2 * i_reg + i_reg / 4) & 7 ) );
+    op_from_addr = ( REGS_BASE + ( ( i_w ) ? ( 2 * i_reg ) : ( 2 * i_reg + i_reg / 4 ) & 7 ) );
     if( i_d )
     {
       scratch_uint = op_from_addr ;
@@ -674,11 +673,33 @@ int main(int argc, char **argv)
     case 0x04 :
       if( i_w )
       {
-        MUL_MACRO( uint16_t , regs16 ) ;
+        int8_t flagRet ;
+
+        set_opcode( 0x10 ) ;
+
+        op_result  = ( uint16_t ) regs16[ 0 ] ;
+        op_result *= *( uint16_t * )&mem[ rm_addr ] ;
+
+        regs16[ i_w + 1 ] = op_result >> 16 ;
+        regs16[ REG_AX  ] = op_result ;
+
+        flagRet = set_CF( op_result - ( uint16_t ) op_result ) ;
+        set_OF( flagRet ) ;
       }
       else
       {
-        MUL_MACRO( uint8_t , regs8 ) ;
+        int8_t flagRet ;
+
+        set_opcode( 0x10 ) ;
+
+        op_result  = ( uint8_t ) regs8[ 0 ] ;
+        op_result *= *( uint8_t * )&mem[ rm_addr ] ;
+
+        regs8[ i_w + 1 ] = op_result >> 16 ;
+        regs16[ REG_AX ] = op_result ;
+
+        flagRet = set_CF( op_result - ( uint8_t ) op_result ) ;
+        set_OF( flagRet ) ;
       }
       break ;
 
@@ -885,7 +906,9 @@ int main(int argc, char **argv)
       }
       else // POP
       {
-        R_M_POP( mem[ rm_addr ] ) ;
+        i_w = 1 ;
+        regs16[ REG_SP ] += 2 ;
+        R_M_OP( mem[ rm_addr ] , =, mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
       }
       break ;
 
@@ -1216,17 +1239,23 @@ int main(int argc, char **argv)
     // RET|RETF|IRET
     case 0x13 :
       i_d = i_w ;
-      R_M_POP( reg_ip ) ;
+      i_w = 1 ;
+      regs16[ REG_SP ] += 2 ;
+      R_M_OP( reg_ip , =, mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
 
       // IRET|RETF|RETF imm16
       if( stOpcode.extra )
       {
-        R_M_POP( regs16[ REG_CS ] ) ;
+        i_w = 1 ;
+        regs16[ REG_SP ] += 2 ;
+        R_M_OP( regs16[ REG_CS ] , =, mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
       }
 
       if( stOpcode.extra & 0x02 )// IRET
       {
-        set_flags( R_M_POP( scratch_uint ) ) ;
+        i_w = 1 ;
+        regs16[ REG_SP ] += 2 ;
+        set_flags( R_M_OP( scratch_uint , = , mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ) ;
       }
       else if( !i_d ) // RET|RETF imm16
       {
@@ -1281,7 +1310,9 @@ int main(int argc, char **argv)
 
     // POP reg
     case 0x1A :
-      R_M_POP( regs16[ stOpcode.extra ] ) ;
+      i_w = 1 ;
+      regs16[ REG_SP ] += 2 ;
+      R_M_OP( regs16[ stOpcode.extra ] , =, mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
       break ;
 
     // xS: segment overrides
@@ -1575,7 +1606,10 @@ int main(int argc, char **argv)
     // 80186, NEC V20: LEAVE
     case 0x34 :
       regs16[ REG_SP ] = regs16[ REG_BP ] ;
-      R_M_POP( regs16[ REG_BP ] ) ;
+
+      i_w = 1 ;
+      regs16[ REG_SP ] += 2 ;
+      R_M_OP( regs16[ REG_BP ] , =, mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
       break ;
 
     // 80186, NEC V20: PUSHA
