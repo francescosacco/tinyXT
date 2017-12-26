@@ -162,7 +162,6 @@ uint16_t   i_data1      ;
 uint16_t   i_data2      ;
 
 uint8_t   bios_table_lookup[ 20 ][ 256 ] ;
-uint8_t * opcode_stream   ;
 uint8_t * regs8           ;
 uint8_t   i_rm            ;
 uint8_t   i_w             ;
@@ -227,9 +226,15 @@ int8_t set_AF_OF_arith( void )
   {
     reg = set_OF( 0 ) ;
   }
+  else if( i_w )
+  {
+    // i_w == 1
+    reg = set_OF( 1 & ( regs8[ FLAG_CF ] ^ op_source >> 15 ) ) ;
+  }
   else
   {
-    reg = set_OF( 1 & ( regs8[ FLAG_CF ] ^ op_source >> ( 8 * ( i_w + 1 ) - 1 ) ) ) ;
+    // i_w == 0
+    reg = set_OF( 1 & ( regs8[ FLAG_CF ] ^ op_source >> 7 ) ) ;
   }
 
   return( reg ) ;
@@ -253,7 +258,7 @@ void set_flags( int new_flags )
 {
   uint8_t i ;
 
-  for(i = 0 ; i < 9 ; i++ )
+  for( i = 0 ; i < 9 ; i++ )
   {
     regs8[ FLAG_CF + i ] = ( 1 << bios_table_lookup[ TABLE_FLAGS_BITFIELDS ][ i ] & new_flags ) ? XTRUE : XFALSE ;
   }
@@ -293,7 +298,7 @@ int8_t pc_interrupt( uint8_t interrupt_num )
 // AAA and AAS instructions - which_operation is +1 for AAA, and -1 for AAS
 int AAA_AAS(int8_t which_operation)
 {
-    return (regs16[REG_AX] += 262 * which_operation*set_AF(set_CF(((regs8[REG_AL] & 0x0F) > 9) || regs8[FLAG_AF])), regs8[REG_AL] &= 0x0F);
+  return( regs16[ REG_AX ] += 262 * which_operation * set_AF( set_CF( ( ( regs8[ REG_AL ] & 0x0F) > 9) || regs8[FLAG_AF])), regs8[REG_AL] &= 0x0F);
 }
 
 void Reset(void)
@@ -364,6 +369,7 @@ int CALLBACK WinMain(
 int main(int argc, char **argv)
 #endif
 {
+  uint8_t * opcode_stream   ;
 
 #if defined(_WIN32)
   Interface.SetInstance(hInstance);
@@ -737,7 +743,21 @@ int main(int argc, char **argv)
     case 0x06 :
       if( i_w )
       {
-        DIV_MACRO( uint16_t , uint32_t , regs16 ) ;
+        scratch_int = *( uint16_t * ) &mem[ rm_addr ] ;
+        if( scratch_int )
+        {
+          scratch_uint  = ( regs16[ 2 ] << 16 ) + regs16[ REG_AX ] ;
+          scratch2_uint = ( uint32_t )( scratch_uint ) / scratch_int ;
+          if( scratch2_uint - ( uint16_t ) scratch2_uint )
+          {
+            pc_interrupt( 0 ) ;
+          }
+          else
+          {
+            regs16[ 0 ] = scratch2_uint ;
+            regs16[ 2 ] = scratch_uint - scratch_int * scratch2_uint ;
+          }
+        }
       }
       else
       {
