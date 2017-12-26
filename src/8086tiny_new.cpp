@@ -761,7 +761,21 @@ int main(int argc, char **argv)
       }
       else
       {
-        DIV_MACRO( uint8_t , uint16_t , regs8 ) ;
+        scratch_int = *( uint8_t * ) &mem[ rm_addr ] ;
+        if( scratch_int )
+        {
+          scratch_uint = ( regs8[ 1 ] << 16 ) + regs16[ REG_AX ] ;
+          scratch2_uint = (uint16_t)( scratch_uint ) / scratch_int ;
+          if( scratch2_uint - ( uint8_t )scratch2_uint )
+          {
+            pc_interrupt( 0 ) ;
+          }
+          else
+          {
+            regs8[ 0 ] = scratch2_uint ;
+            regs8[ 1 ] = scratch_uint - scratch_int * scratch2_uint ;
+          }
+        }
       }
       break ;
 
