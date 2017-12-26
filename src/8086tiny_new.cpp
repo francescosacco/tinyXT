@@ -1479,13 +1479,21 @@ int main(int argc, char **argv)
       case 0x03 :
         if( i_w )
         {
-          R_M_OP( mem[ rm_addr ] , += ( regs8[ FLAG_CF ] << ( 16 - scratch_uint ) ) + , scratch2_uint << ( 17 - scratch_uint ) ) ;
+          // Execute arithmetic/logic operations.
+          op_dest   = *( uint16_t * )&mem[ rm_addr ] ;
+          op_source = *( uint16_t * )&scratch2_uint << ( 17 - scratch_uint )  ;
+          op_result = *( uint16_t * )&mem[ rm_addr ] += ( regs8[ FLAG_CF ] << ( 16 - scratch_uint ) ) + op_source ;
+
           set_CF( scratch2_uint & 1 << ( scratch_uint - 1 ) ) ;
           set_OF( ( 1 & *( int16_t * )&( op_result ) >> 15 ) ^ ( 1 & *( int16_t * )&op_result * 2 >> 15 ) ) ;
         }
         else
         {
-          R_M_OP( mem[ rm_addr ] , += ( regs8[ FLAG_CF ] << ( 8 - scratch_uint ) ) + , scratch2_uint << ( 9 - scratch_uint ) ) ;
+          // Execute arithmetic/logic operations.
+          op_dest   = mem[ rm_addr ] ;
+          op_source = *( uint8_t * )&scratch2_uint << ( 9 - scratch_uint ) ;
+          op_result = mem[ rm_addr ] += ( regs8[ FLAG_CF ] << ( 8 - scratch_uint ) ) + op_source ;
+
           set_CF( scratch2_uint & 1 << ( scratch_uint - 1 ) ) ;
           set_OF( ( 1 & op_result >> 7 ) ^ ( 1 & ( op_result * 2 ) >> 7 ) ) ;
         }
@@ -1522,7 +1530,20 @@ int main(int argc, char **argv)
           set_CF( scratch2_uint ) ;
         }
         set_OF( 0 ) ;
-        R_M_OP( mem[ rm_addr ] , += , scratch2_uint *= ~( ( ( 1 << 8*( i_w + 1 ) ) - 1 ) >> scratch_uint ) ) ;
+
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_dest   = *( uint16_t * )&mem[ rm_addr ] ;
+          op_source = *( uint16_t * )&scratch2_uint *= ~( ( ( 1 << 16 ) - 1 ) >> scratch_uint )  ;
+          op_result = *( uint16_t * )&mem[ rm_addr ] += op_source ;
+        }
+        else
+        {
+          op_dest   = mem[ rm_addr ] ;
+          op_source = *( uint8_t * )&scratch2_uint *= ~( ( ( 1 << 8 ) - 1 ) >> scratch_uint ) ;
+          op_result = mem[ rm_addr ] += op_source ;
+        }
         break ;
       }
       break ;
@@ -1574,7 +1595,19 @@ int main(int argc, char **argv)
 
     // TEST reg, r/m
     case 0x0F :
-      R_M_OP( mem[ op_from_addr ] , & , mem[ op_to_addr ] ) ;
+      // Execute arithmetic/logic operations.
+      if( i_w )
+      {
+        op_dest   = *( uint16_t * )&mem[ op_from_addr ] ;
+        op_source = *( uint16_t * )&mem[ op_to_addr ]  ;
+        op_result = *( uint16_t * )&mem[ op_from_addr ] & op_source ;
+      }
+      else
+      {
+        op_dest   = mem[ op_from_addr ] ;
+        op_source = *( uint8_t * )&mem[ op_to_addr ] ;
+        op_result = mem[ op_from_addr ] & op_source ;
+      }
       break ;
 
     // XCHG AX, regs16
@@ -1587,9 +1620,31 @@ int main(int argc, char **argv)
     case 0x18 :
       if( op_to_addr != op_from_addr )
       {
-        R_M_OP( mem[ op_to_addr ]   , ^= , mem[ op_from_addr ] ) ;
-        R_M_OP( mem[ op_from_addr ] , ^= , mem[ op_to_addr   ] ) ;
-        R_M_OP( mem[ op_to_addr ]   , ^= , mem[ op_from_addr ] ) ;
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_source = *( uint16_t * )&mem[ op_from_addr ]  ;
+          op_result = *( uint16_t * )&mem[ op_to_addr ] ^= op_source ;
+
+          op_source = *( uint16_t * )&mem[ op_to_addr   ]  ;
+          op_result = *( uint16_t * )&mem[ op_from_addr ] ^= op_source ;
+
+          op_dest   = *( uint16_t * )&mem[ op_to_addr ] ;
+          op_source = *( uint16_t * )&mem[ op_from_addr ]  ;
+          op_result = *( uint16_t * )&mem[ op_to_addr ] ^= op_source ;
+        }
+        else
+        {
+          op_source = *( uint8_t * )&mem[ op_from_addr ] ;
+          op_result = mem[ op_to_addr ] ^= op_source ;
+
+          op_dest   = mem[ op_from_addr ] ;
+          op_source = *( uint8_t * )&mem[ op_to_addr   ] ;
+          op_result = mem[ op_from_addr ] ^= op_source ;
+
+          op_source = *( uint8_t * )&mem[ op_from_addr ] ;
+          op_result = mem[ op_to_addr ] ^= op_source ;
+        }
       }
       break ;
 
