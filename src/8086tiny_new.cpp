@@ -117,9 +117,6 @@ T8086TinyInterface_t Interface ;
 // Execute arithmetic/logic operations in emulator memory/registers
 #define R_M_OP(dest,op,src) (i_w ? op_dest = *(uint16_t*)&dest, op_result = *(uint16_t*)&dest op (op_source = *(uint16_t*)&src) : (op_dest = dest, op_result = dest op (op_source = *(uint8_t*)&src)))
 
-// Helpers for stack operations
-#define R_M_POP(a) (i_w = 1, regs16[REG_SP] += 2, R_M_OP(a, =, mem[16 * regs16[REG_SS] + (uint16_t)(-2+ regs16[REG_SP])]))
-
 // Global variable definitions
 
 typedef struct STOPCODE_T
@@ -2422,16 +2419,37 @@ int main(int argc, char **argv)
     // 80186, NEC V20: POPA
     case 0x63 :
       // POP DI, POP SI, POP BP, ADD SP,2, POP BX, POP DX, POP CX, POP AX
-      R_M_POP( regs16[ REG_DI ] ) ;
-      R_M_POP( regs16[ REG_SI ] ) ;
-      R_M_POP( regs16[ REG_BP ] ) ;
+      i_w = 1 ;
+
+      // POP regs16[ REG_DI ].
+      regs16[ REG_SP ] += 2 ;
+      R_M_OP( regs16[ REG_DI ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
+
+      // POP regs16[ REG_SI ].
+      regs16[ REG_SP ] += 2 ;
+      R_M_OP( regs16[ REG_SI ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
+
+      // POP regs16[ REG_BP ].
+      regs16[ REG_SP ] += 2 ;
+      R_M_OP( regs16[ REG_BP ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
 
       regs16[ REG_SP ] += 2 ;
 
-      R_M_POP( regs16[ REG_BX ] ) ;
-      R_M_POP( regs16[ REG_DX ] ) ;
-      R_M_POP( regs16[ REG_CX ] ) ;
-      R_M_POP( regs16[ REG_AX ] ) ;
+      // POP regs16[ REG_BX ].
+      regs16[ REG_SP ] += 2 ;
+      R_M_OP( regs16[ REG_BX ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
+
+      // POP regs16[ REG_DX ].
+      regs16[ REG_SP ] += 2 ;
+      R_M_OP( regs16[ REG_DX ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
+
+      // POP regs16[ REG_CX ].
+      regs16[ REG_SP ] += 2 ;
+      R_M_OP( regs16[ REG_CX ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
+
+      // POP regs16[ REG_AX ].
+      regs16[ REG_SP ] += 2 ;
+      R_M_OP( regs16[ REG_AX ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
       break ;
 
     // 80186: BOUND
