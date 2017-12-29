@@ -107,7 +107,6 @@ T8086TinyInterface_t Interface ;
 // Helper macros
 
 // [I]MUL/[I]DIV/DAA/DAS/ADC/SBB helpers
-#define DIV_MACRO(out_data_type,in_data_type,out_regs) (scratch_int = *(out_data_type*)&mem[rm_addr]) && !(scratch2_uint = (in_data_type)(scratch_uint = (out_regs[i_w+1] << 16) + regs16[REG_AX]) / scratch_int, scratch2_uint - (out_data_type)scratch2_uint) ? out_regs[i_w+1] = scratch_uint - scratch_int * (*out_regs = scratch2_uint) : pc_interrupt(0)
 #define DAA_DAS(op1,op2) \
                   set_AF((((scratch_uchar = regs8[REG_AL]) & 0x0F) > 9) || regs8[FLAG_AF]) && (op_result = (regs8[REG_AL] op1 6), set_CF(regs8[FLAG_CF] || (regs8[REG_AL] op2 scratch_uchar))), \
                                   set_CF((regs8[REG_AL] > 0x9f) || regs8[FLAG_CF]) && (op_result = (regs8[REG_AL] op1 0x60))
@@ -747,7 +746,7 @@ int main(int argc, char **argv)
         if( scratch_int )
         {
           scratch_uint  = ( regs16[ 2 ] << 16 ) + regs16[ REG_AX ] ;
-          scratch2_uint = ( uint32_t )( scratch_uint ) / scratch_int ;
+          scratch2_uint = ( uint32_t ) ( scratch_uint ) / scratch_int ;
           if( scratch2_uint - ( uint16_t ) scratch2_uint )
           {
             pc_interrupt( 0 ) ;
@@ -764,8 +763,8 @@ int main(int argc, char **argv)
         scratch_int = *( uint8_t * ) &mem[ rm_addr ] ;
         if( scratch_int )
         {
-          scratch_uint = ( regs8[ 1 ] << 16 ) + regs16[ REG_AX ] ;
-          scratch2_uint = (uint16_t)( scratch_uint ) / scratch_int ;
+          scratch_uint  = ( regs8[ 1 ] << 16 ) + regs16[ REG_AX ] ;
+          scratch2_uint = ( uint16_t ) ( scratch_uint ) / scratch_int ;
           if( scratch2_uint - ( uint8_t )scratch2_uint )
           {
             pc_interrupt( 0 ) ;
@@ -783,11 +782,39 @@ int main(int argc, char **argv)
     case 0x07 :
       if( i_w )
       {
-        DIV_MACRO( int16_t , int32_t , regs16 ) ;
+        scratch_int   = *( int16_t * ) &mem[ rm_addr ] ;
+        if( scratch_int )
+        {
+          scratch_uint  = ( regs16[ 2 ] << 16 ) + regs16[ REG_AX ] ;
+          scratch2_uint = ( int32_t ) ( scratch_uint ) / scratch_int ;
+          if( scratch2_uint - ( int16_t ) scratch2_uint )
+          {
+            pc_interrupt( 0 ) ;
+          }
+          else
+          {
+            regs16[ 0 ] = scratch2_uint ;
+            regs16[ 2 ] = scratch_uint - scratch_int * scratch2_uint ;
+          }
+        }
       }
       else
       {
-        DIV_MACRO( int8_t, int16_t, regs8);
+        scratch_int = *( int8_t * ) &mem[ rm_addr ] ;
+        if( scratch_int )
+        {
+          scratch_uint  = ( regs8[ 1 ] << 16 ) + regs16[ REG_AX ] ;
+          scratch2_uint = ( int16_t ) ( scratch_uint ) / scratch_int ;
+          if( scratch2_uint - ( int8_t ) scratch2_uint )
+          {
+            pc_interrupt( 0 ) ;
+          }
+          else
+          {
+            regs8[ 0 ] = scratch2_uint ;
+            regs8[ 1 ] = scratch_uint - scratch_int * scratch2_uint ;
+          }
+        }
       }
       break ;
     }
