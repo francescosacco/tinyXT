@@ -895,7 +895,28 @@ int main(int argc, char **argv)
 
       // MOV
       case 0x08 :
-        R_M_MOV( mem[ op_to_addr ] , mem[ op_from_addr ] ) ;
+        if( i_w )
+        {
+          uint16_t aux ;
+
+          op_dest = *( uint16_t * )&mem[ op_to_addr ] ;
+
+          aux = *( uint16_t * )&mem[ op_from_addr ] ;
+          op_source = aux ;
+          op_result = aux ;
+          *( uint16_t * )&mem[ op_to_addr ] = aux ;
+        }
+        else
+        {
+          uint8_t aux ;
+
+          op_dest = mem[ op_to_addr ] ;
+
+          aux = *( uint8_t * )&mem[ op_from_addr ] ;
+          op_source = aux ;
+          op_result = aux ;
+          mem[ op_to_addr ] = aux ;
+        }
         break ;
       }
       break ;
