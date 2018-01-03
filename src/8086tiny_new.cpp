@@ -118,10 +118,6 @@ T8086TinyInterface_t Interface ;
 #define R_M_OP(dest,op,src) (i_w ? op_dest = *(uint16_t*)&dest, op_result = *(uint16_t*)&dest op (op_source = *(uint16_t*)&src) \
                                  : (op_dest = dest, op_result = dest op (op_source = *(uint8_t*)&src)))
 
-// Execute a memory move with no other operation on dest
-#define R_M_MOV(dest,src) (i_w ? op_dest = *(uint16_t*)&dest, op_result = *(uint16_t*)&dest = (op_source = *(uint16_t*)&src) \
-                                 : (op_dest = dest, op_result = dest = (op_source = *(uint8_t*)&src)))
-
 // Helpers for stack operations
 #define R_M_PUSH(a) (i_w = 1, R_M_OP(mem[SEGREG_OP(REG_SS, REG_SP, --)], =, a))
 #define R_M_POP(a) (i_w = 1, regs16[REG_SP] += 2, R_M_OP(a, =, mem[SEGREG_OP(REG_SS, REG_SP, -2+)]))
@@ -1324,9 +1320,32 @@ int main(int argc, char **argv)
       scratch2_uint = ( seg_override_en ) ? ( seg_override     ) : ( REG_DS ) ;
       scratch_uint  = ( rep_override_en ) ? ( regs16[ REG_CX ] ) : ( 1      ) ;
 
-      for( ; scratch_uint ; scratch_uint-- )
+      while( scratch_uint )
       {
-        R_M_MOV( mem[ ( stOpcode.extra < 2 ) ? SEGREG( REG_ES , REG_DI ) : REGS_BASE ] , mem[ ( stOpcode.extra & 1 ) ? REGS_BASE : SEGREG( scratch2_uint , REG_SI ) ] ) ;
+        // MOV
+        if( i_w )
+        {
+          uint16_t aux ;
+
+          op_dest = *( uint16_t * )&( mem[ ( stOpcode.extra < 2 ) ? SEGREG( REG_ES , REG_DI ) : REGS_BASE ] ) ;
+
+          aux = *( uint16_t * )&( mem[ ( stOpcode.extra & 1 ) ? REGS_BASE : SEGREG( scratch2_uint , REG_SI ) ] ) ;
+          op_source = aux ;
+          op_result = aux ;
+          *( uint16_t * )&( mem[ ( stOpcode.extra < 2 ) ? SEGREG( REG_ES , REG_DI ) : REGS_BASE ] ) = aux ;
+        }
+        else
+        {
+          uint8_t aux ;
+
+          op_dest = ( mem[ ( stOpcode.extra < 2 ) ? SEGREG( REG_ES , REG_DI ) : REGS_BASE ] ) ;
+
+          aux = *( uint8_t * )&( mem[ ( stOpcode.extra & 1 ) ? REGS_BASE : SEGREG( scratch2_uint , REG_SI ) ] ) ;
+          op_source = aux ;
+          op_result = aux ;
+          ( mem[ ( stOpcode.extra < 2 ) ? SEGREG( REG_ES , REG_DI ) : REGS_BASE ] ) = aux ;
+        }
+
         if( ( stOpcode.extra & 0x01 ) == 0x00 )
         {
           regs16[ REG_SI ] -= ( 2 * regs8[ FLAG_DF ] - 1 ) * ( i_w + 1 ) ;
@@ -1336,6 +1355,8 @@ int main(int argc, char **argv)
         {
           regs16[ REG_DI ] -= ( 2 * regs8[ FLAG_DF ] - 1 ) * ( i_w + 1 ) ;
         }
+
+        scratch_uint-- ;
       }
 
       if( rep_override_en )
@@ -1412,7 +1433,31 @@ int main(int argc, char **argv)
     // MOV r/m, immed
     case 0x14 :
       regs16[ REG_TMP ] = i_data2 ;
-      R_M_MOV( mem[ op_from_addr ] , mem[ REGS_BASE + REG_TMP * 2 ] ) ;
+
+      // MOV
+      if( i_w )
+      {
+        uint16_t aux ;
+        op_dest = *( uint16_t * )&mem[ op_from_addr ] ;
+
+        aux = *( uint16_t * )&mem[ REGS_BASE + REG_TMP * 2 ] ;
+
+        op_source = aux ;
+        op_result = aux ;
+        *( uint16_t * )&mem[ op_from_addr ] = aux ;
+      }
+      else
+      {
+        uint8_t aux ;
+
+        op_dest = mem[ op_from_addr ] ;
+
+        aux = *( uint8_t * )&mem[ REGS_BASE + REG_TMP * 2 ] ;
+
+        op_source = aux ;
+        op_result = aux ;
+        mem[ op_from_addr ] = aux ;
+      }
       break ;
 
     // IN AL/AX, DX/imm8
