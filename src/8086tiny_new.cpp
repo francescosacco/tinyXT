@@ -1002,7 +1002,31 @@ int main(int argc, char **argv)
           op_to_addr   = scratch_uint ;
         }
 
-        R_M_MOV( mem[ op_from_addr ] , rm_addr ) ;
+        // MOV
+        if( i_w )
+        {
+          uint16_t aux ;
+
+          op_dest = *( uint16_t * )&mem[ op_from_addr ] ;
+
+          aux = *( uint16_t * )&rm_addr ;
+
+          op_source = aux ;
+          op_result = aux ;
+          *( uint16_t * )&mem[ op_from_addr ] = aux ;
+        }
+        else
+        {
+          uint8_t aux ;
+
+          op_dest = mem[ op_from_addr ] ;
+
+          aux = *( uint8_t * )&rm_addr ;
+
+          op_source = aux ;
+          op_result = aux ;
+          mem[ op_from_addr ] = aux ;
+        }
       }
       else // POP
       {
@@ -1052,7 +1076,29 @@ int main(int argc, char **argv)
         op_to_addr   = scratch_uint ;
       }
 
-      R_M_MOV( mem[ op_from_addr ] , mem[ op_to_addr ] ) ;
+      // MOV
+      if( i_w )
+      {
+        uint16_t aux ;
+
+        op_dest = *( uint16_t * )&mem[ op_from_addr ] ;
+
+        aux = *( uint16_t * )&mem[ op_to_addr ] ;
+        op_source = aux ;
+        op_result = aux ;
+        *( uint16_t * )&mem[ op_from_addr ] = aux ;
+      }
+      else
+      {
+        uint8_t aux ;
+
+        op_dest = mem[ op_from_addr ] ;
+
+        aux = *( uint8_t * )&mem[ op_to_addr ] ;
+        op_source = aux ;
+        op_result = aux ;
+        mem[ op_from_addr ] = aux ;
+      }
       break ;
 
     // ROL|ROR|RCL|RCR|SHL|SHR|???|SAR reg/mem, 1/CL/imm (80186)
