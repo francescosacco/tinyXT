@@ -122,9 +122,6 @@ T8086TinyInterface_t Interface ;
 #define R_M_PUSH(a) (i_w = 1, R_M_OP(mem[16 * regs16[REG_SS] + (uint16_t)(--regs16[REG_SP])], =, a))
 #define R_M_POP(a) (i_w = 1, regs16[REG_SP] += 2, R_M_OP(a, =, mem[16 * regs16[REG_SS] + (uint16_t)(-2+ regs16[REG_SP])]))
 
-// Convert segment:offset to linear address in emulator memory space
-#define SEGREG_OP(reg_seg,reg_ofs,op) 16 * regs16[reg_seg] + (uint16_t)(op regs16[reg_ofs])
-
 // Global variable definitions
 
 typedef struct STOPCODE_T
@@ -1536,7 +1533,7 @@ int main(int argc, char **argv)
     case 0x1A :
       i_w = 1 ;
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( regs16[ stOpcode.extra ] , =, mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
+      R_M_OP( regs16[ stOpcode.extra ] , =, mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ) ;
       break ;
 
     // xS: segment overrides
@@ -1784,9 +1781,14 @@ int main(int argc, char **argv)
           addr += ( uint16_t ) regs16[ REG_BX ] ;
 
           memcpy( &mem[ addr ] , localtime( &clock_buf ) , sizeof( struct tm ) ) ;
-        }
 
-        *( int16_t * )&mem[ SEGREG_OP( REG_ES , REG_BX , 36+ ) ] = ms_clock.millitm ;
+          // Convert segment:offset to linear address.
+          addr  = 16 ;
+          addr *= regs16[ REG_ES ] ;
+          addr += ( uint16_t ) ( regs16[ REG_BX ] + 36 ) ;
+
+          *( int16_t * )&mem[ addr ] = ms_clock.millitm ;
+        }
         break ;
 
       // DISK_READ
@@ -1854,7 +1856,7 @@ int main(int argc, char **argv)
 
       i_w = 1 ;
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( regs16[ REG_BP ] , =, mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
+      R_M_OP( regs16[ REG_BP ] , =, mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ) ;
       break ;
 
     // 80186, NEC V20: PUSHA
