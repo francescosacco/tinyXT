@@ -198,7 +198,7 @@ int8_t set_AF( int new_AF )
 }
 
 // Set overflow flag
-int8_t set_OF(int new_OF)
+int8_t set_OF( int new_OF )
 {
   uint8_t reg ;
 
@@ -296,7 +296,7 @@ int AAA_AAS(int8_t which_operation)
   return( regs16[ REG_AX ] += 262 * which_operation * set_AF( set_CF( ( ( regs8[ REG_AL ] & 0x0F) > 9) || regs8[FLAG_AF])), regs8[REG_AL] &= 0x0F);
 }
 
-void Reset(void)
+void Reset( void )
 {
   uint32_t i ;
 
@@ -1322,28 +1322,40 @@ int main(int argc, char **argv)
 
       while( scratch_uint )
       {
+        uint32_t addrDst ;
+        uint32_t addrSrc ;
+
+        // Convert segment:offset to linear address.
+        addrSrc  = 16 ;
+        addrSrc *= regs16[ scratch2_uint ] ;
+        addrSrc += ( uint16_t ) regs16[ REG_SI ] ;
+
+        addrDst  = 16 ;
+        addrDst *= regs16[ REG_ES ] ;
+        addrDst += ( uint16_t ) regs16[ REG_DI ] ;
+
         // MOV
         if( i_w )
         {
           uint16_t aux ;
 
-          op_dest = *( uint16_t * )&( mem[ ( stOpcode.extra < 2 ) ? SEGREG( REG_ES , REG_DI ) : REGS_BASE ] ) ;
+          op_dest = *( uint16_t * )&( mem[ ( stOpcode.extra < 2 ) ? addrDst : REGS_BASE ] ) ;
 
-          aux = *( uint16_t * )&( mem[ ( stOpcode.extra & 1 ) ? REGS_BASE : SEGREG( scratch2_uint , REG_SI ) ] ) ;
+          aux = *( uint16_t * )&( mem[ ( stOpcode.extra & 1 ) ? REGS_BASE : addrSrc ] ) ;
           op_source = aux ;
           op_result = aux ;
-          *( uint16_t * )&( mem[ ( stOpcode.extra < 2 ) ? SEGREG( REG_ES , REG_DI ) : REGS_BASE ] ) = aux ;
+          *( uint16_t * )&( mem[ ( stOpcode.extra < 2 ) ? addrDst : REGS_BASE ] ) = aux ;
         }
         else
         {
           uint8_t aux ;
 
-          op_dest = ( mem[ ( stOpcode.extra < 2 ) ? SEGREG( REG_ES , REG_DI ) : REGS_BASE ] ) ;
+          op_dest = ( mem[ ( stOpcode.extra < 2 ) ? addrDst : REGS_BASE ] ) ;
 
-          aux = *( uint8_t * )&( mem[ ( stOpcode.extra & 1 ) ? REGS_BASE : SEGREG( scratch2_uint , REG_SI ) ] ) ;
+          aux = *( uint8_t * )&( mem[ ( stOpcode.extra & 1 ) ? REGS_BASE : addrSrc ] ) ;
           op_source = aux ;
           op_result = aux ;
-          ( mem[ ( stOpcode.extra < 2 ) ? SEGREG( REG_ES , REG_DI ) : REGS_BASE ] ) = aux ;
+          ( mem[ ( stOpcode.extra < 2 ) ? addrDst : REGS_BASE ] ) = aux ;
         }
 
         if( ( stOpcode.extra & 0x01 ) == 0x00 )
@@ -1752,13 +1764,20 @@ int main(int argc, char **argv)
           seekRet = ~lseek( disk[ regs8[ REG_DL ] ] , *( uint32_t * )&regs16[ REG_BP ] << 9 , 0 ) ;
           if( seekRet )
           {
+            // Convert segment:offset to linear address.
+            uint32_t addr ;
+
+            addr  = 16 ;
+            addr *= regs16[ REG_ES ] ;
+            addr += ( uint16_t ) regs16[ REG_BX ] ;
+
             if( ( ( int8_t ) i_data0 ) == 3 )
             {
-              regs8[ REG_AL ] = write( disk[ regs8[ REG_DL ] ] , mem + SEGREG( REG_ES , REG_BX ) , regs16[ REG_AX ] ) ;
+              regs8[ REG_AL ] = write( disk[ regs8[ REG_DL ] ] , ( mem + addr ) , regs16[ REG_AX ] ) ;
             }
             else
             {
-              regs8[ REG_AL ] = read( disk[ regs8[ REG_DL ] ] , mem + SEGREG( REG_ES , REG_BX ) , regs16[ REG_AX ] ) ;
+              regs8[ REG_AL ] = read( disk[ regs8[ REG_DL ] ] , ( mem + addr ) , regs16[ REG_AX ] ) ;
             }
           }
           else
