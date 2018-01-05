@@ -123,7 +123,6 @@ T8086TinyInterface_t Interface ;
 #define R_M_POP(a) (i_w = 1, regs16[REG_SP] += 2, R_M_OP(a, =, mem[SEGREG_OP(REG_SS, REG_SP, -2+)]))
 
 // Convert segment:offset to linear address in emulator memory space
-#define SEGREG(reg_seg,reg_ofs) 16 * regs16[reg_seg] + (uint16_t)(regs16[reg_ofs])
 #define SEGREG_OP(reg_seg,reg_ofs,op) 16 * regs16[reg_seg] + (uint16_t)(op regs16[reg_ofs])
 
 // Global variable definitions
@@ -276,18 +275,18 @@ int8_t pc_interrupt( uint8_t interrupt_num )
   // Decode like INT.
   set_opcode( 0xCD ) ;
 
-    make_flags() ;
-    R_M_PUSH( scratch_uint     ) ;
-    R_M_PUSH( regs16[ REG_CS ] ) ;
-    R_M_PUSH( reg_ip           ) ;
+  make_flags() ;
+  R_M_PUSH( scratch_uint     ) ;
+  R_M_PUSH( regs16[ REG_CS ] ) ;
+  R_M_PUSH( reg_ip           ) ;
 
-    R_M_OP( mem[ REGS_BASE + 2 * REG_CS ] , = , mem[ 4 * interrupt_num + 2 ] ) ;
-    R_M_OP( reg_ip                        , = , mem[ 4 * interrupt_num     ] ) ;
+  R_M_OP( mem[ REGS_BASE + 2 * REG_CS ] , = , mem[ 4 * interrupt_num + 2 ] ) ;
+  R_M_OP( reg_ip                        , = , mem[ 4 * interrupt_num     ] ) ;
 
-    regs8[ FLAG_IF ] = 0 ;
-    regs8[ FLAG_TF ] = 0 ;
+  regs8[ FLAG_IF ] = 0 ;
+  regs8[ FLAG_TF ] = 0 ;
 
-    return( 0 ) ;
+  return( 0 ) ;
 }
 
 // AAA and AAS instructions - which_operation is +1 for AAA, and -1 for AAS
@@ -457,7 +456,7 @@ int main(int argc, char **argv)
     }
     else // If i_mod is 1, operand is (usually) 8 bits rather than 16 bits
     {
-      i_data1 = ( int8_t )i_data1 ;
+      i_data1 = ( int8_t ) i_data1 ;
     }
 
     scratch2_uint = 4 * !i_mod ;
@@ -516,17 +515,17 @@ int main(int argc, char **argv)
     i_w = ( stOpcode.raw_opcode_id & 8 ) ? ( XTRUE ) : ( XFALSE ) ;
     if( i_w )
     {
-      *( uint16_t * )&op_dest   = *(uint16_t*)&mem[ REGS_BASE + ( 2 * i_reg4bit ) ] ;
-      *( uint16_t * )&op_source = *(uint16_t*)&i_data0 ;
-      *( uint16_t * )&op_result = *(uint16_t*)&i_data0 ;
-      *( uint16_t * )&mem[ REGS_BASE + ( 2 * i_reg4bit ) ] = *(uint16_t*)&i_data0 ;
+      *( uint16_t * )&op_dest   = *( uint16_t * )&mem[ REGS_BASE + ( 2 * i_reg4bit ) ] ;
+      *( uint16_t * )&op_source = *( uint16_t * )&i_data0 ;
+      *( uint16_t * )&op_result = *( uint16_t * )&i_data0 ;
+      *( uint16_t * )&mem[ REGS_BASE + ( 2 * i_reg4bit ) ] = *( uint16_t * )&i_data0 ;
     }
     else
     {
-      *( uint8_t * )&op_dest   = *(uint8_t*)&mem[ REGS_BASE + ( ( 2 * i_reg4bit + i_reg4bit / 4 ) & 0x07 ) ] ;
-      *( uint8_t * )&op_source = *(uint8_t*)&i_data0 ;
-      *( uint8_t * )&op_result = *(uint8_t*)&i_data0 ;
-      *( uint8_t * )&mem[ REGS_BASE + ( ( 2 * i_reg4bit + i_reg4bit / 4 ) & 0x07 ) ] = *(uint8_t*)&i_data0 ;
+      *( uint8_t * )&op_dest   = *( uint8_t * )&mem[ REGS_BASE + ( ( 2 * i_reg4bit + i_reg4bit / 4 ) & 0x07 ) ] ;
+      *( uint8_t * )&op_source = *( uint8_t * )&i_data0 ;
+      *( uint8_t * )&op_result = *( uint8_t * )&i_data0 ;
+      *( uint8_t * )&mem[ REGS_BASE + ( ( 2 * i_reg4bit + i_reg4bit / 4 ) & 0x07 ) ] = *( uint8_t * )&i_data0 ;
     }
     break ;
 
@@ -599,7 +598,16 @@ int main(int argc, char **argv)
 
       op_source = 1 ;
       set_AF_OF_arith() ;
-      set_OF( op_dest + 1 - i_reg == 1 << ( 8 * ( i_w + 1 ) - 1 ) ) ;
+
+      if( i_w )
+      {
+        set_OF( op_dest + 1 - i_reg == 1 << 15 ) ;
+      }
+      else
+      {
+        set_OF( op_dest + 1 - i_reg == 1 << 7 ) ;
+      }
+
       if( stOpcode.xlat_opcode_id == 0x05 )
       {
         // Decode like ADC.
@@ -609,7 +617,7 @@ int main(int argc, char **argv)
     else if( i_reg != 6 ) // JMP|CALL
     {
       // CALL (far)
-      if( ( i_reg - 3 ) == 0 )
+      if( i_reg == 3 )
       {
         R_M_PUSH( regs16[ REG_CS ] ) ;
       }
@@ -1385,7 +1393,19 @@ int main(int argc, char **argv)
       {
         while( scratch_uint )
         {
-          R_M_OP( mem[ stOpcode.extra ? REGS_BASE : SEGREG( scratch2_uint , REG_SI ) ] , - , mem[ SEGREG( REG_ES , REG_DI ) ] ) ;
+          uint32_t addrSrc ;
+          uint32_t addrDst ;
+
+          // Convert segment:offset to linear address.
+          addrSrc  = 16 ;
+          addrSrc *= regs16[ REG_ES ] ;
+          addrSrc += ( uint16_t ) regs16[ REG_DI ] ;
+
+          addrDst  = 16 ;
+          addrDst *= regs16[ scratch2_uint ] ;
+          addrDst += ( uint16_t ) regs16[ REG_SI ] ;
+
+          R_M_OP( mem[ stOpcode.extra ? REGS_BASE : addrDst ] , - , mem[ addrSrc ] ) ;
 
           if( !stOpcode.extra )
           {
@@ -1420,14 +1440,14 @@ int main(int argc, char **argv)
       i_d = i_w ;
       i_w = 1 ;
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( reg_ip , =, mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
+      R_M_OP( reg_ip , = , mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
 
       // IRET|RETF|RETF imm16
       if( stOpcode.extra )
       {
         i_w = 1 ;
         regs16[ REG_SP ] += 2 ;
-        R_M_OP( regs16[ REG_CS ] , =, mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
+        R_M_OP( regs16[ REG_CS ] , = , mem[ SEGREG_OP( REG_SS , REG_SP , -2+ ) ] ) ;
       }
 
       if( stOpcode.extra & 0x02 )// IRET
@@ -1642,7 +1662,10 @@ int main(int argc, char **argv)
         localAddr  = ( uint16_t ) regs16[ bios_table_lookup[ scratch2_uint + 1 ][ i_rm ] ] ;
         localAddr += ( uint16_t ) bios_table_lookup[ scratch2_uint + 2 ][ i_rm ] * i_data1 ;
         localAddr += ( uint16_t ) regs16[ bios_table_lookup[ scratch2_uint ][ i_rm ] ] ;
-        rm_addr = ( 16 * regs16[ localIndex ] ) + localAddr ;
+
+        rm_addr  = 16 ;
+        rm_addr *= regs16[ localIndex ] ;
+        rm_addr += localAddr ;
       }
       else
       {
@@ -1687,7 +1710,7 @@ int main(int argc, char **argv)
       i_data0 &= 0xFF ;
       if( i_data0 )
       {
-        regs8[ REG_AH ] = regs8[ REG_AL ] / i_data0 ;
+        regs8[ REG_AH ]  = regs8[ REG_AL ] / i_data0 ;
         regs8[ REG_AL ] %= i_data0 ;
         op_result = regs8[ REG_AL ] ;
       }
@@ -1750,7 +1773,18 @@ int main(int argc, char **argv)
       case 0x01 :
         time( &clock_buf ) ;
         ftime( &ms_clock ) ;
-        memcpy( mem + SEGREG( REG_ES , REG_BX ) , localtime( &clock_buf ) , sizeof( struct tm ) ) ;
+
+        {
+          uint32_t addr ;
+
+          // Convert segment:offset to linear address.
+          addr  = 16 ;
+          addr *= regs16[ REG_ES ] ;
+          addr += ( uint16_t ) regs16[ REG_BX ] ;
+
+          memcpy( &mem[ addr ] , localtime( &clock_buf ) , sizeof( struct tm ) ) ;
+        }
+
         *( int16_t * )&mem[ SEGREG_OP( REG_ES , REG_BX , 36+ ) ] = ms_clock.millitm ;
         break ;
 
@@ -1885,13 +1919,20 @@ int main(int argc, char **argv)
       scratch_uint = ( rep_override_en ) ? ( regs16[REG_CX] ) : ( 1 ) ;
       while( scratch_uint )
       {
+        uint32_t addr ;
+
         io_ports[ scratch2_uint ] = Interface.ReadPort( scratch2_uint ) ;
         if( i_w )
         {
           io_ports[ scratch2_uint + 1 ] = Interface.ReadPort( scratch2_uint + 1 ) ;
         }
 
-        R_M_OP( mem[ SEGREG( REG_ES , REG_DI ) ] , = , io_ports[ scratch_uint ] ) ;
+        // Convert segment:offset to linear address.
+        addr  = 16 ;
+        addr *= regs16[ REG_ES ] ;
+        addr += ( uint16_t ) regs16[ REG_DI ] ;
+
+        R_M_OP( mem[ addr ] , = , io_ports[ scratch_uint ] ) ;
         regs16[ REG_DI ] -= ( 2 * regs8[ FLAG_DF ] - 1 ) * ( i_w + 1 ) ;
 
         scratch_uint-- ;
@@ -1915,7 +1956,14 @@ int main(int argc, char **argv)
       scratch_uint = ( rep_override_en ) ? ( regs16[ REG_CX ] ) : ( 1 ) ;
       while( scratch_uint )
       {
-        R_M_OP( io_ports[ scratch2_uint ] , = , mem[ SEGREG( REG_DS , REG_SI ) ] ) ;
+        uint32_t addr ;
+
+        // Convert segment:offset to linear address.
+        addr  = 16 ;
+        addr *= regs16[ REG_DS ] ;
+        addr += ( uint16_t ) regs16[ REG_SI ] ;
+
+        R_M_OP( io_ports[ scratch2_uint ] , = , mem[ addr ] ) ;
         Interface.WritePort( scratch2_uint , io_ports[ scratch2_uint ] ) ;
         if( i_w )
         {
