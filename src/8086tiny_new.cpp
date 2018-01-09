@@ -107,9 +107,9 @@ T8086TinyInterface_t Interface ;
 // Helper macros
 
 // [I]MUL/[I]DIV/DAA/DAS/ADC/SBB helpers
-#define DAA_DAS(op1,op2) \
-                  set_AF((((scratch_uchar = regs8[REG_AL]) & 0x0F) > 9) || regs8[FLAG_AF]) && (op_result = (regs8[REG_AL] op1 6), set_CF(regs8[FLAG_CF] || (regs8[REG_AL] op2 scratch_uchar))), \
+#define DAA_DAS(op1,op2) set_AF((((scratch_uchar = regs8[REG_AL]) & 0x0F) > 9) || regs8[FLAG_AF]) && (op_result = (regs8[REG_AL] op1 6), set_CF(regs8[FLAG_CF] || (regs8[REG_AL] op2 scratch_uchar))), \
                                   set_CF((regs8[REG_AL] > 0x9f) || regs8[FLAG_CF]) && (op_result = (regs8[REG_AL] op1 0x60))
+
 #define ADC_SBB_MACRO(a) R_M_OP( mem[ op_to_addr ] , a##= regs8[FLAG_CF] + , mem[ op_from_addr ] ), \
                          set_CF((regs8[FLAG_CF] && (op_result == op_dest)) || (a op_result < a(int)op_dest)), \
                          set_AF_OF_arith()
@@ -142,7 +142,7 @@ uint32_t op_from_addr   ;
 uint32_t scratch_uint   ;
 uint32_t scratch2_uint  ;
 
-int i_data1r , op_result , disk[ 3 ] , scratch_int ;
+int op_result , disk[ 3 ] , scratch_int ;
 
 uint16_t * regs16       ;
 uint16_t   reg_ip       ;
@@ -164,9 +164,6 @@ uint8_t   seg_override_en ;
 uint8_t   rep_override_en ;
 uint8_t   trap_flag       ;
 uint8_t   scratch_uchar   ;
-
-time_t clock_buf ;
-struct timeb ms_clock ;
 
 // Helper functions
 
@@ -400,8 +397,8 @@ int main(int argc, char **argv)
   Interface.Initialise( mem ) ;
 
   // regs16 and reg8 point to F000:0, the start of memory-mapped registers
-  regs8  = ( uint8_t  * ) ( mem + REGS_BASE ) ;
-  regs16 = ( uint16_t * ) ( mem + REGS_BASE ) ;
+  regs8  = ( uint8_t  * ) ( mem + REGS_BASE ) ; // Base + 000F.0000
+  regs16 = ( uint16_t * ) ( mem + REGS_BASE ) ; // Base + 000F.0000
 
   // Clear BIOS and disk filed.
   disk[ 0 ] = 0 ;
@@ -534,9 +531,9 @@ int main(int argc, char **argv)
     scratch_uchar  &= 7 ;
 
     reg_ip += (int8_t)i_data0 * ( i_w ^ ( regs8[ bios_table_lookup[ TABLE_COND_JUMP_DECODE_A ][ scratch_uchar ] ] ||
-                                regs8[ bios_table_lookup[ TABLE_COND_JUMP_DECODE_B ][ scratch_uchar ] ] ||
-                                regs8[ bios_table_lookup[ TABLE_COND_JUMP_DECODE_C ][ scratch_uchar ] ] ^
-                                regs8[ bios_table_lookup[ TABLE_COND_JUMP_DECODE_D ][ scratch_uchar ] ] ) ) ;
+                                          regs8[ bios_table_lookup[ TABLE_COND_JUMP_DECODE_B ][ scratch_uchar ] ] ||
+                                          regs8[ bios_table_lookup[ TABLE_COND_JUMP_DECODE_C ][ scratch_uchar ] ] ^
+                                          regs8[ bios_table_lookup[ TABLE_COND_JUMP_DECODE_D ][ scratch_uchar ] ] ) ) ;
     break ;
 
   // MOV reg, imm
@@ -623,7 +620,28 @@ int main(int argc, char **argv)
     // INC|DEC
     if( i_reg < 2 )
     {
-      R_M_OP( mem[ op_from_addr ] , += 1 - 2 * i_reg + , mem[ REGS_BASE + 2 * REG_ZERO ] ) ;
+      uint32_t addr ;
+
+      addr  = REG_ZERO ;
+      addr *= 2 ;
+      addr += REGS_BASE ;
+
+      if( i_w )
+      {
+        op_dest = *( uint16_t * )&mem[ op_from_addr ] ;
+        op_source = *( uint16_t * )&mem[ addr ] ;
+
+        *( uint16_t * )&mem[ op_from_addr ] += 1 - 2 * i_reg + op_source ;
+        op_result = *( uint16_t * )&mem[ op_from_addr ] ;
+      }
+      else
+      {
+        op_dest = mem[ op_from_addr ] ;
+
+        op_source = *( uint8_t * )&mem[ addr ] ;
+        mem[ op_from_addr ] += 1 - 2 * i_reg + op_source ;
+        op_result = mem[ op_from_addr ] ;
+      }
 
       op_source = 1 ;
       set_AF_OF_arith() ;
@@ -1801,11 +1819,13 @@ int main(int argc, char **argv)
 
       // GET_RTC
       case 0x01 :
-        time( &clock_buf ) ;
-        ftime( &ms_clock ) ;
-
         {
+          time_t clock_buf ;
+          struct timeb ms_clock ;
           uint32_t addr ;
+
+          time( &clock_buf ) ;
+          ftime( &ms_clock ) ;
 
           // Convert segment:offset to linear address.
           addr  = 16 ;
