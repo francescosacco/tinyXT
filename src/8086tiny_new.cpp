@@ -115,8 +115,7 @@ T8086TinyInterface_t Interface ;
                          set_AF_OF_arith()
 
 // Execute arithmetic/logic operations in emulator memory/registers
-#define R_M_OP(dest,op,src) (i_w ? op_dest = *(uint16_t*)&dest, op_result = *(uint16_t*)&dest op (op_source = *(uint16_t*)&src) \
-                                 : (op_dest = dest, op_result = dest op (op_source = *(uint8_t*)&src)))
+#define R_M_OP(dest,op,src) (i_w ? op_dest = *(uint16_t*)&dest, op_result = *(uint16_t*)&dest op (op_source = *(uint16_t*)&src) : (op_dest = dest, op_result = dest op (op_source = *(uint8_t*)&src)))
 
 // Helpers for stack operations
 #define R_M_PUSH(a) (i_w = 1, R_M_OP(mem[16 * regs16[REG_SS] + (uint16_t)(--regs16[REG_SP])], =, a))
@@ -277,8 +276,41 @@ int8_t pc_interrupt( uint8_t interrupt_num )
   R_M_PUSH( regs16[ REG_CS ] ) ;
   R_M_PUSH( reg_ip           ) ;
 
-  R_M_OP( mem[ REGS_BASE + 2 * REG_CS ] , = , mem[ 4 * interrupt_num + 2 ] ) ;
-  R_M_OP( reg_ip                        , = , mem[ 4 * interrupt_num     ] ) ;
+  // Execute arithmetic/logic operations in emulator memory/registers
+  if( i_w )
+  {
+    op_dest   = *( uint16_t * )&mem[ REGS_BASE + 2 * REG_CS ] ;
+
+    op_source = *( uint16_t * )&mem[ 4 * interrupt_num + 2 ] ;
+    op_result = op_source ;
+    *( uint16_t * )&mem[ REGS_BASE + 2 * REG_CS ] = op_source ;
+  }
+  else
+  {
+    op_dest = mem[ REGS_BASE + 2 * REG_CS ] ;
+
+    op_source = *(uint8_t*)&mem[ 4 * interrupt_num + 2 ] ;
+    op_result = op_source  ;
+    mem[ REGS_BASE + 2 * REG_CS ] = op_source ;
+  }
+
+  // Execute arithmetic/logic operations in emulator memory/registers
+  if( i_w )
+  {
+    op_dest = *( uint16_t * )&reg_ip ;
+
+    op_source = *( uint16_t * )&mem[ 4 * interrupt_num ] ;
+    op_result = op_source ;
+    *( uint16_t * )&reg_ip = op_source ;
+  }
+  else
+  {
+    op_dest = reg_ip ;
+
+    op_source = *( uint8_t * )&mem[ 4 * interrupt_num ] ;
+    reg_ip    = op_source ;
+    op_result = op_source ;
+  }
 
   regs8[ FLAG_IF ] = 0 ;
   regs8[ FLAG_TF ] = 0 ;
@@ -1986,6 +2018,7 @@ int main(int argc, char **argv)
     // 8087 MATH Coprocessor
     case 0x45 :
       printf( "8087 coprocessor instruction: 0x%02X\n" , stOpcode.raw_opcode_id ) ;
+      ExitEmulation = true ;
       break ;
 
     // 80286+
