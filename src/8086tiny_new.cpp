@@ -736,12 +736,35 @@ int main(int argc, char **argv)
 
     // NOT
     case 0x02 :
-      R_M_OP( mem[ op_to_addr ] , =~ , mem[ op_from_addr ] ) ;
+      // Execute arithmetic/logic operations.
+      if( i_w )
+      {
+        op_dest   = *( uint16_t * )&mem[ op_to_addr ] ;
+        op_source = *( uint16_t * )&mem[ op_from_addr ]  ;
+        op_result = *( uint16_t * )&mem[ op_to_addr ] =~ op_source ;
+      }
+      else
+      {
+        op_dest   = mem[ op_to_addr ] ;
+        op_source = *( uint8_t * )&mem[ op_from_addr ] ;
+        op_result = mem[ op_to_addr ] =~ op_source ;
+      }
       break ;
 
     // NEG
     case 0x03 :
-      R_M_OP( mem[ op_to_addr ] ,=- , mem[ op_from_addr ] ) ;
+      // Execute arithmetic/logic operations.
+      if( i_w )
+      {
+        op_source = *( uint16_t * )&mem[ op_from_addr ]  ;
+        op_result = *( uint16_t * )&mem[ op_to_addr ] =- op_source ;
+      }
+      else
+      {
+        op_source = *( uint8_t * )&mem[ op_from_addr ] ;
+        op_result = mem[ op_to_addr ] =- op_source ;
+      }
+
       op_dest = 0 ;
 
       // Decode like SUB
@@ -931,13 +954,38 @@ int main(int argc, char **argv)
     {
       // ADD
       case 0x00 :
-        R_M_OP( mem[ op_to_addr ] , += , mem[ op_from_addr ] ) ;
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_dest   = *( uint16_t * )&mem[ op_to_addr ] ;
+          op_source = *( uint16_t * )&mem[ op_from_addr ]  ;
+          op_result = *( uint16_t * )&mem[ op_to_addr ] += op_source ;
+        }
+        else
+        {
+          op_dest   = mem[ op_to_addr ] ;
+          op_source = *( uint8_t * )&mem[ op_from_addr ] ;
+          op_result = mem[ op_to_addr ] += op_source ;
+        }
+
         set_CF( op_result < op_dest ) ;
         break ;
 
       // OR
       case 0x01 :
-        R_M_OP( mem[ op_to_addr ] , |= , mem[ op_from_addr ] ) ;
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_dest   = *( uint16_t * )&mem[ op_to_addr ] ;
+          op_source = *( uint16_t * )&mem[ op_from_addr ]  ;
+          op_result = *( uint16_t * )&mem[ op_to_addr ] |= op_source ;
+        }
+        else
+        {
+          op_dest   = mem[ op_to_addr ] ;
+          op_source = *( uint8_t * )&mem[ op_from_addr ] ;
+          op_result = mem[ op_to_addr ] |= op_source ;
+        }
         break ;
 
       // ADC
