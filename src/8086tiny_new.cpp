@@ -286,7 +286,7 @@ int8_t pc_interrupt( uint8_t interrupt_num )
   {
     op_dest = mem[ REGS_BASE + 2 * REG_CS ] ;
 
-    op_source = *(uint8_t*)&mem[ 4 * interrupt_num + 2 ] ;
+    op_source = *( uint8_t * )&mem[ 4 * interrupt_num + 2 ] ;
     op_result = op_source  ;
     mem[ REGS_BASE + 2 * REG_CS ] = op_source ;
   }
@@ -681,7 +681,22 @@ int main(int argc, char **argv)
         ( regs16[ REG_CS ] = *( int16_t * )&mem[ op_from_addr + 2 ] ) ;
       }
 
-      R_M_OP( reg_ip , = , mem[ op_from_addr ] ) ;
+      if( i_w )
+      {
+        op_dest = *( uint16_t * )&reg_ip ;
+
+        op_source = *(uint16_t*)&mem[ op_from_addr ] ;
+        op_result = op_source ;
+        *(uint16_t*)&reg_ip = op_source ;
+      }
+      else
+      {
+        op_dest = reg_ip ;
+
+        op_source = *(uint8_t*)&mem[ op_from_addr ] ;
+        op_result = op_source ;
+        reg_ip = op_source ;
+      }
 
       // Decode like CALL
       set_opcode( 0x9A ) ;
@@ -703,7 +718,20 @@ int main(int argc, char **argv)
       // Decode like AND
       set_opcode( 0x20 ) ;
       reg_ip += i_w + 1;
-      R_M_OP( mem[ op_to_addr ] , & , i_data2 ) ;
+
+      // Execute arithmetic/logic operations.
+      if( i_w )
+      {
+        op_dest   = *( uint16_t * )&mem[ op_to_addr ] ;
+        op_source = *( uint16_t * )&i_data2  ;
+        op_result = *( uint16_t * )&mem[ op_to_addr ] & op_source ;
+      }
+      else
+      {
+        op_dest   = mem[ op_to_addr ] ;
+        op_source = *( uint8_t * )&i_data2 ;
+        op_result = mem[ op_to_addr ] & op_source ;
+      }
       break ;
 
     // NOT
