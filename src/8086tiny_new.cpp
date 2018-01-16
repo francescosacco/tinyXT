@@ -1139,7 +1139,23 @@ int main(int argc, char **argv)
           op_to_addr   = scratch_uint ;
         }
 
-        R_M_OP( mem[ op_to_addr ] , = , mem[ op_from_addr ] ) ;
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_dest   = *( uint16_t * )&mem[ op_to_addr ] ;
+
+          op_source = *( uint16_t * )&mem[ op_from_addr ]  ;
+          op_result = op_source ;
+          *( uint16_t * )&mem[ op_to_addr ] = op_source ;
+        }
+        else
+        {
+          op_dest   = mem[ op_to_addr ] ;
+
+          op_source = *( uint8_t * )&mem[ op_from_addr ] ;
+          op_result = op_source ;
+          mem[ op_to_addr ] = op_source ;
+        }
       }
       else if( !i_d ) // LEA
       {
@@ -1207,9 +1223,20 @@ int main(int argc, char **argv)
       }
       else // POP
       {
+        uint32_t addr ;
+
         i_w = 1 ;
         regs16[ REG_SP ] += 2 ;
-        R_M_OP( mem[ rm_addr ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ) ;
+
+        op_dest   = *( uint16_t * )&mem[ rm_addr ] ;
+
+        addr  = 16 ;
+        addr *= regs16[ REG_SS ] ;
+        addr += ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ;
+
+        op_source = *( uint16_t * )&mem[ addr ]  ;
+        op_result = op_source ;
+        *( uint16_t * )&mem[ rm_addr ] = op_source ;
       }
       break ;
 
