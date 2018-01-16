@@ -1000,23 +1000,73 @@ int main(int argc, char **argv)
 
       // AND
       case 0x04 :
-        R_M_OP( mem[ op_to_addr ] , &= , mem[ op_from_addr ] ) ;
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_dest   = *( uint16_t * )&mem[ op_to_addr ] ;
+          op_source = *( uint16_t * )&mem[ op_from_addr ]  ;
+          op_result = *( uint16_t * )&mem[ op_to_addr ] &= op_source ;
+        }
+        else
+        {
+          op_dest   = mem[ op_to_addr ] ;
+          op_source = *( uint8_t * )&mem[ op_from_addr ] ;
+          op_result = mem[ op_to_addr ] &= op_source ;
+        }
         break ;
 
       // SUB
       case 0x05 :
-        R_M_OP( mem[ op_to_addr ] , -= , mem[ op_from_addr ] ) ;
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_dest   = *( uint16_t * )&mem[ op_to_addr ] ;
+          op_source = *( uint16_t * )&mem[ op_from_addr ]  ;
+          op_result = *( uint16_t * )&mem[ op_to_addr ] -= op_source ;
+        }
+        else
+        {
+          op_dest   = mem[ op_to_addr ] ;
+          op_source = *( uint8_t * )&mem[ op_from_addr ] ;
+          op_result = mem[ op_to_addr ] -= op_source ;
+        }
+
         set_CF( op_result > op_dest ) ;
         break ;
 
       // XOR
       case 0x06 :
-        R_M_OP( mem[ op_to_addr ] , ^= , mem[ op_from_addr ] ) ;
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_dest   = *( uint16_t * )&mem[ op_to_addr ] ;
+          op_source = *( uint16_t * )&mem[ op_from_addr ]  ;
+          op_result = *( uint16_t * )&mem[ op_to_addr ] ^= op_source ;
+        }
+        else
+        {
+          op_dest   = mem[ op_to_addr ] ;
+          op_source = *( uint8_t * )&mem[ op_from_addr ] ;
+          op_result = mem[ op_to_addr ] ^= op_source ;
+        }
         break ;
 
       // CMP
       case 0x07 :
-        R_M_OP( mem[ op_to_addr ] , - , mem[ op_from_addr ] ) ;
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_dest   = *( uint16_t * )&mem[ op_to_addr ] ;
+          op_source = *( uint16_t * )&mem[ op_from_addr ]  ;
+          op_result = *( uint16_t * )&mem[ op_to_addr ] - op_source ;
+        }
+        else
+        {
+          op_dest   = mem[ op_to_addr ] ;
+          op_source = *( uint8_t * )&mem[ op_from_addr ] ;
+          op_result = mem[ op_to_addr ] - op_source ;
+        }
+
         set_CF( op_result > op_dest ) ;
         break ;
 
