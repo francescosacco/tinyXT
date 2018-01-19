@@ -1342,16 +1342,53 @@ int main(int argc, char **argv)
         if( i_reg < 4 ) // Rotate operations
         {
           scratch_uint %= i_reg / 2 + 8 * ( i_w + 1 ) ;
-          R_M_OP( scratch2_uint , = , mem[ rm_addr ] ) ;
+
+          // Execute arithmetic/logic operations.
+          if( i_w )
+          {
+            op_dest   = *( uint16_t * )&scratch2_uint ;
+            op_source = *( uint16_t * )&mem[ rm_addr ]  ;
+            op_result = *( uint16_t * )&scratch2_uint = op_source ;
+          }
+          else
+          {
+            op_dest   = scratch2_uint ;
+            op_source = *( uint8_t * )&mem[ rm_addr ] ;
+            op_result = scratch2_uint = op_source ;
+          }
         }
 
         if( i_reg & 1 ) // Rotate/shift right operations
         {
-          R_M_OP( mem[ rm_addr ] , >>= , scratch_uint ) ;
+          // Execute arithmetic/logic operations.
+          if( i_w )
+          {
+            op_dest   = *( uint16_t * )&mem[ rm_addr ] ;
+            op_source = *( uint16_t * )&scratch_uint  ;
+            op_result = *( uint16_t * )&mem[ rm_addr ] >>= op_source ;
+          }
+          else
+          {
+            op_dest   = mem[ rm_addr ] ;
+            op_source = *( uint8_t * )&scratch_uint ;
+            op_result = mem[ rm_addr ] >>= op_source ;
+          }
         }
         else // Rotate/shift left operations
         {
-          R_M_OP( mem[ rm_addr ] , <<= , scratch_uint ) ;
+          // Execute arithmetic/logic operations.
+          if( i_w )
+          {
+            op_dest   = *( uint16_t * )&mem[ rm_addr ] ;
+            op_source = *( uint16_t * )&scratch_uint  ;
+            op_result = *( uint16_t * )&mem[ rm_addr ] <<= op_source ;
+          }
+          else
+          {
+            op_dest   = mem[ rm_addr ] ;
+            op_source = *( uint8_t * )&scratch_uint ;
+            op_result = mem[ rm_addr ] <<= op_source ;
+          }
         }
 
         // Shift operations
