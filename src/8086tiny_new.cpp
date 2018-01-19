@@ -1409,36 +1409,68 @@ int main(int argc, char **argv)
       {
       // ROL
       case 0x00 :
-        R_M_OP( mem[ rm_addr ] , += , scratch2_uint >> ( 8 * ( i_w + 1 ) - scratch_uint ) ) ;
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_dest   = *( uint16_t * )&mem[ rm_addr ] ;
+          op_source = *( uint16_t * )&scratch2_uint >> ( 16 - scratch_uint )  ;
+          op_result = *( uint16_t * )&mem[ rm_addr ] += op_source ;
 
-        // Returns sign bit of an 8-bit or 16-bit operand
-        set_OF( ( 1 & ( ( i_w ) ? *( int16_t * )&( op_result ) : ( op_result ) ) >> ( 8 * ( i_w + 1 ) - 1 ) ) ^ set_CF( op_result & 1 ) ) ;
+          // Returns sign bit of an 8-bit or 16-bit operand
+          set_OF( ( 1 & ( *( int16_t * )&( op_result ) ) >> 15 ) ^ set_CF( op_result & 1 ) ) ;
+        }
+        else
+        {
+          op_dest   = mem[ rm_addr ] ;
+          op_source = *( uint8_t * )&scratch2_uint >> ( 8 - scratch_uint ) ;
+          op_result = mem[ rm_addr ] += op_source ;
+
+          // Returns sign bit of an 8-bit or 16-bit operand
+          set_OF( ( 1 & op_result >> 7 ) ^ set_CF( op_result & 1 ) ) ;
+        }
         break ;
 
       // ROR
       case 0x01 :
         scratch2_uint &= ( 1 << scratch_uint ) - 1 ;
-        R_M_OP( mem[ rm_addr ] , += , scratch2_uint << ( 8 * ( i_w + 1 ) - scratch_uint ) ) ;
 
         if( i_w )
         {
+          // Execute arithmetic/logic operations.
+          op_dest   = *( uint16_t * )&mem[ rm_addr ] ;
+          op_source = *( uint16_t * )&scratch2_uint << ( 16 - scratch_uint )  ;
+          op_result = *( uint16_t * )&mem[ rm_addr ] += op_source ;
+
           set_OF( ( 1 & ( *( int16_t * )&op_result * 2 ) >> 15 ) ^ set_CF( 1 & ( *( int16_t * )&( op_result ) ) >> 15 ) ) ;
         }
         else
         {
+          // Execute arithmetic/logic operations.
+          op_dest   = mem[ rm_addr ] ;
+          op_source = *( uint8_t * )&scratch2_uint << ( 8 - scratch_uint ) ;
+          op_result = mem[ rm_addr ] += op_source ;
+
           set_OF( ( 1 & ( op_result * 2 ) >> 7 ) ^ set_CF( 1 & ( op_result ) >> 7 ) ) ;
         }
         break ;
 
       // RCL
       case 0x02 :
-        R_M_OP( mem[ rm_addr ] , += ( regs8[ FLAG_CF ] << ( scratch_uint - 1 ) ) + , scratch2_uint >> ( 1 + 8 * ( i_w + 1 ) - scratch_uint ) ) ;
+        // Execute arithmetic/logic operations.
         if( i_w )
         {
+          op_dest   = *( uint16_t * )&mem[ rm_addr ] ;
+          op_source = *( uint16_t * )&scratch2_uint >> ( 17 - scratch_uint )  ;
+          op_result = *( uint16_t * )&mem[ rm_addr ] += ( regs8[ FLAG_CF ] << ( scratch_uint - 1 ) ) + op_source ;
+
           set_OF( ( 1 & *( int16_t * )&( op_result ) >> 15 ) ^ set_CF( scratch2_uint & 1 << ( 16 - scratch_uint ) ) ) ;
         }
         else
         {
+          op_dest   = mem[ rm_addr ] ;
+          op_source = *( uint8_t * )&scratch2_uint >> ( 9 - scratch_uint ) ;
+          op_result = mem[ rm_addr ] += ( regs8[ FLAG_CF ] << ( scratch_uint - 1 ) ) + op_source ;
+
           set_OF( ( ( 1 & op_result ) >> 7 ) ^ set_CF( scratch2_uint & 1 << ( 8 - scratch_uint ) ) ) ;
         }
         break ;
