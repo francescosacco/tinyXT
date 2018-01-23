@@ -1730,7 +1730,19 @@ int main(int argc, char **argv)
           addrDst *= regs16[ scratch2_uint ] ;
           addrDst += ( uint16_t ) regs16[ REG_SI ] ;
 
-          R_M_OP( mem[ stOpcode.extra ? REGS_BASE : addrDst ] , - , mem[ addrSrc ] ) ;
+          // Execute arithmetic/logic operations.
+          if( i_w )
+          {
+            op_dest   = *( uint16_t * )&mem[ stOpcode.extra ? REGS_BASE : addrDst ] ;
+            op_source = *( uint16_t * )&mem[ addrSrc ]  ;
+            op_result = *( uint16_t * )&mem[ stOpcode.extra ? REGS_BASE : addrDst ] - op_source ;
+          }
+          else
+          {
+            op_dest   = mem[ stOpcode.extra ? REGS_BASE : addrDst ] ;
+            op_source = *( uint8_t * )&mem[ addrSrc ] ;
+            op_result = mem[ stOpcode.extra ? REGS_BASE : addrDst ] - op_source ;
+          }
 
           if( !stOpcode.extra )
           {
@@ -1762,10 +1774,33 @@ int main(int argc, char **argv)
 
     // RET|RETF|IRET
     case 0x13 :
-      i_d = i_w ;
-      i_w = 1 ;
-      regs16[ REG_SP ] += 2 ;
-      R_M_OP( reg_ip , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ) ;
+      {
+        uint32_t addr ;
+
+        i_d = i_w ;
+        i_w = 1 ;
+        regs16[ REG_SP ] += 2 ;
+
+        addr  = 16 ;
+        addr *= regs16[ REG_SS ] ;
+        addr += ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ;
+
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_dest   = *( uint16_t * )&reg_ip ;
+          op_source = *( uint16_t * )&mem[ addr ]  ;
+          op_result = op_source ;
+          *( uint16_t * )&reg_ip = op_source ;
+        }
+        else
+        {
+          op_dest   = reg_ip ;
+          op_source = *( uint8_t * )&mem[ addr ] ;
+          op_result = op_source ;
+          reg_ip = op_source ;
+        }
+      }
 
       // IRET|RETF|RETF imm16
       if( stOpcode.extra )
