@@ -1807,14 +1807,31 @@ int main(int argc, char **argv)
       {
         i_w = 1 ;
         regs16[ REG_SP ] += 2 ;
-        R_M_OP( regs16[ REG_CS ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ) ;
+
+        // Execute arithmetic/logic operations.
+        op_dest   = *( uint16_t * )&regs16[ REG_CS ] ;
+
+        op_source = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ]  ;
+        op_result = op_source ;
+        *( uint16_t * )&regs16[ REG_CS ] = op_source ;
       }
 
       if( stOpcode.extra & 0x02 )// IRET
       {
+        uint32_t addr ;
+
         i_w = 1 ;
         regs16[ REG_SP ] += 2 ;
-        set_flags( R_M_OP( scratch_uint , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ) ) ;
+
+        op_dest = *( uint16_t * )&scratch_uint ;
+
+        addr  = 16 ;
+        addr *= regs16[ REG_SS ] ;
+        addr += ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ;
+
+        op_source = *( uint16_t * )&mem[ addr ] ;
+        op_result = *( uint16_t * )&scratch_uint = op_source ;
+        set_flags( op_result ) ;
       }
       else if( !i_d ) // RET|RETF imm16
       {
