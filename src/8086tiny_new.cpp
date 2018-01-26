@@ -1877,18 +1877,48 @@ int main(int argc, char **argv)
       if( i_w )
       {
         io_ports[ scratch_uint + 1 ] = Interface.ReadPort( scratch_uint + 1 ) ;
+
+        // Execute arithmetic/logic operations.
+        op_dest   = *( uint16_t * )&regs8[ REG_AL ] ;
+        op_source = *( uint16_t * )&io_ports[ scratch_uint ]  ;
+        op_result = op_source ;
+        *( uint16_t * )&regs8[ REG_AL ] = op_source ;
       }
-      R_M_OP( regs8[ REG_AL ] , = , io_ports[ scratch_uint ] ) ;
+      else
+      {
+        // Execute arithmetic/logic operations.
+        op_dest   = regs8[ REG_AL ] ;
+        op_source = *( uint8_t * )&io_ports[ scratch_uint ] ;
+        op_result = op_source ;
+        regs8[ REG_AL ] = op_source ;
+      }
       break ;
 
     // OUT DX/imm8, AL/AX
     case 0x16 :
       scratch_uint = ( stOpcode.extra ) ? ( regs16[ REG_DX ] ) : ( ( uint8_t ) i_data0 ) ;
-      R_M_OP( io_ports[ scratch_uint ] , = , regs8[ REG_AL ] ) ;
-      Interface.WritePort( scratch_uint , io_ports[ scratch_uint ] ) ;
+
+      // Execute arithmetic/logic operations.
       if( i_w )
       {
+        op_dest   = *( uint16_t * )&io_ports[ scratch_uint ] ;
+
+        op_source = *( uint16_t * )&regs8[ REG_AL ]  ;
+        op_result = op_source ;
+        *( uint16_t * )&io_ports[ scratch_uint ] = op_source ;
+
+        Interface.WritePort( scratch_uint , io_ports[ scratch_uint ] ) ;
         Interface.WritePort( scratch_uint + 1 , io_ports[ scratch_uint + 1 ] ) ;
+      }
+      else
+      {
+        op_dest   = io_ports[ scratch_uint ] ;
+
+        op_source = *( uint8_t * )&regs8[ REG_AL ] ;
+        op_result = op_source ;
+        io_ports[ scratch_uint ] = op_source ;
+
+        Interface.WritePort( scratch_uint , io_ports[ scratch_uint ] ) ;
       }
       break ;
 
