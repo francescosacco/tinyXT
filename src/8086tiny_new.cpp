@@ -2156,7 +2156,19 @@ int main(int argc, char **argv)
 
     // TEST AL/AX, immed
     case 0x2F :
-      R_M_OP( regs8[ REG_AL ] , & , i_data0 ) ;
+      // Execute arithmetic/logic operations.
+      if( i_w )
+      {
+        op_dest   = *( uint16_t * )&regs8[ REG_AL ] ;
+        op_source = *( uint16_t * )&i_data0  ;
+        op_result = *( uint16_t * )&regs8[ REG_AL ] & op_source ;
+      }
+      else
+      {
+        op_dest   = regs8[ REG_AL ] ;
+        op_source = *( uint8_t * )&i_data0 ;
+        op_result = regs8[ REG_AL ] & op_source ;
+      }
       break ;
 
     // LOCK
@@ -2346,9 +2358,21 @@ int main(int argc, char **argv)
         addr *= regs16[ REG_ES ] ;
         addr += ( uint16_t ) regs16[ REG_DI ] ;
 
-        R_M_OP( mem[ addr ] , = , io_ports[ scratch_uint ] ) ;
-        regs16[ REG_DI ] -= ( 2 * regs8[ FLAG_DF ] - 1 ) * ( i_w + 1 ) ;
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_dest   = *( uint16_t * )&mem[ addr ] ;
+          op_source = *( uint16_t * )&io_ports[ scratch_uint ]  ;
+          op_result = *( uint16_t * )&mem[ addr ] = op_source ;
+        }
+        else
+        {
+          op_dest   = mem[ addr ] ;
+          op_source = *( uint8_t * )&io_ports[ scratch_uint ] ;
+          op_result = mem[ addr ] = op_source ;
+        }
 
+        regs16[ REG_DI ] -= ( 2 * regs8[ FLAG_DF ] - 1 ) * ( i_w + 1 ) ;
         scratch_uint-- ;
       }
 
