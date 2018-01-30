@@ -2293,7 +2293,21 @@ int main(int argc, char **argv)
 
       i_w = 1 ;
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( regs16[ REG_BP ] , =, mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ) ;
+
+      // Execute arithmetic/logic operations.
+      {
+        uint32_t addr ;
+
+        op_dest   = *( uint16_t * )&regs16[ REG_BP ] ;
+
+        addr  = 16 ;
+        addr *= regs16[ REG_SS ] ;
+        addr += ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ;
+
+        op_source = *( uint16_t * )&mem[ addr ]  ;
+        op_result = op_source ;
+        *( uint16_t * )&regs16[ REG_BP ] = op_source ;
+      }
       break ;
 
     // 80186, NEC V20: PUSHA
@@ -2415,7 +2429,20 @@ int main(int argc, char **argv)
         addr *= regs16[ REG_DS ] ;
         addr += ( uint16_t ) regs16[ REG_SI ] ;
 
-        R_M_OP( io_ports[ scratch2_uint ] , = , mem[ addr ] ) ;
+        // Execute arithmetic/logic operations.
+        if( i_w )
+        {
+          op_dest   = *( uint16_t * )&io_ports[ scratch2_uint ] ;
+          op_source = *( uint16_t * )&mem[ addr ]  ;
+          op_result = *( uint16_t * )&io_ports[ scratch2_uint ] = op_source ;
+        }
+        else
+        {
+          op_dest   = io_ports[ scratch2_uint ] ;
+          op_source = *( uint8_t * )&mem[ addr ] ;
+          op_result = io_ports[ scratch2_uint ] = op_source ;
+        }
+
         Interface.WritePort( scratch2_uint , io_ports[ scratch2_uint ] ) ;
         if( i_w )
         {
