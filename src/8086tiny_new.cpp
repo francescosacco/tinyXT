@@ -1942,7 +1942,13 @@ int main(int argc, char **argv)
     case 0x1A :
       i_w = 1 ;
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( regs16[ stOpcode.extra ] , =, mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ] ) ;
+
+      // Execute arithmetic/logic operations.
+      op_dest   = *( uint16_t * )&regs16[ stOpcode.extra ] ;
+
+      op_source = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( regs16[ REG_SP ] - 2 ) ]  ;
+      op_result = op_source ;
+      *( uint16_t * )&regs16[ stOpcode.extra ] = op_source ;
       break ;
 
     // xS: segment overrides
@@ -2087,8 +2093,16 @@ int main(int argc, char **argv)
         op_to_addr   = scratch_uint ;
       }
 
-      R_M_OP( mem[ op_to_addr                 ] , = , mem[ op_from_addr ] ) ;
-      R_M_OP( mem[ REGS_BASE + stOpcode.extra ] , = , mem[ rm_addr + 2  ] ) ;
+      // Execute arithmetic/logic operations.
+      op_source = *( uint16_t * )&mem[ op_from_addr ]  ;
+      op_result = op_source ;
+      *( uint16_t * )&mem[ op_to_addr ] = op_source ;
+
+      op_dest   = *( uint16_t * )&mem[ REGS_BASE + stOpcode.extra ] ;
+
+      op_source = *( uint16_t * )&mem[ rm_addr + 2 ]  ;
+      op_result = op_source ;
+      *( uint16_t * )&mem[ REGS_BASE + stOpcode.extra ] = op_source ;
       break ;
 
     // INT 3
