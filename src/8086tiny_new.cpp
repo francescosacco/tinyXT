@@ -110,7 +110,7 @@ T8086TinyInterface_t Interface ;
 #define DAA_DAS(op1,op2) set_AF((((scratch_uchar = regs8[REG_AL]) & 0x0F) > 9) || regs8[FLAG_AF]) && (op_result = (regs8[REG_AL] op1 6), set_CF(regs8[FLAG_CF] || (regs8[REG_AL] op2 scratch_uchar))), \
                                   set_CF((regs8[REG_AL] > 0x9f) || regs8[FLAG_CF]) && (op_result = (regs8[REG_AL] op1 0x60))
 
-#define ADC_SBB_MACRO(a) R_M_OP( mem[ op_to_addr ] , a##= regs8[FLAG_CF] + , mem[ op_from_addr ] ), \
+#define ADC_SBB_MACRO(a) (i_w ? op_dest = *(uint16_t*)&mem[ op_to_addr ], op_result = *(uint16_t*)&mem[ op_to_addr ] a##= regs8[FLAG_CF] + (op_source = *(uint16_t*)&mem[ op_from_addr ]) : (op_dest = mem[ op_to_addr ], op_result = mem[ op_to_addr ] a##= regs8[FLAG_CF] + (op_source = *(uint8_t*)&mem[ op_from_addr ]))), \
                          set_CF((regs8[FLAG_CF] && (op_result == op_dest)) || (a op_result < a(int)op_dest)), \
                          set_AF_OF_arith()
 
