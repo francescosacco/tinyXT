@@ -269,9 +269,15 @@ int8_t pc_interrupt( uint8_t interrupt_num )
   set_opcode( 0xCD ) ;
 
   make_flags() ;
-  R_M_PUSH( scratch_uint     ) ;
-  R_M_PUSH( regs16[ REG_CS ] ) ;
-  R_M_PUSH( reg_ip           ) ;
+
+  i_w = 1 ;
+
+  // PUSH scratch_uint.
+  R_M_OP( mem[16 * regs16[REG_SS] + (uint16_t)(--regs16[REG_SP])] , = , scratch_uint ) ;
+  // PUSH regs16[ REG_CS ].
+  R_M_OP( mem[16 * regs16[REG_SS] + (uint16_t)(--regs16[REG_SP])] , = , regs16[ REG_CS ] ) ;
+  // PUSH reg_ip.
+  R_M_OP( mem[16 * regs16[REG_SS] + (uint16_t)(--regs16[REG_SP])] , = , reg_ip ) ;
 
   // Execute arithmetic/logic operations in emulator memory/registers
   if( i_w )
@@ -666,7 +672,9 @@ int main(int argc, char **argv)
       // CALL (far)
       if( i_reg == 3 )
       {
-        R_M_PUSH( regs16[ REG_CS ] ) ;
+        // PUSH regs16[ REG_CS ].
+        i_w = 1 ;
+        R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t )( --regs16[ REG_SP ] ) ] , = , regs16[ REG_CS ] ) ;
       }
 
       // CALL (near or far)
