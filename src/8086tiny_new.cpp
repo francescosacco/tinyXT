@@ -680,13 +680,15 @@ int main(int argc, char **argv)
       // CALL (near or far)
       if( i_reg & 0x02 )
       {
-        R_M_PUSH( reg_ip + 2 + i_mod * ( i_mod != 3 ) + 2 * ( !i_mod && i_rm == 6 ) ) ;
+        // PUSH ( reg_ip + 2 + i_mod * ( i_mod != 3 ) + 2 * ( !i_mod && i_rm == 6 ) ).
+        i_w = 1 ;
+        R_M_OP( mem[ 16 * regs16[ REG_SS ] + (uint16_t)(--regs16[REG_SP])], =, reg_ip + 2 + i_mod * ( i_mod != 3 ) + 2 * ( !i_mod && i_rm == 6 ) ) ;
       }
 
       // JMP|CALL (far)
       if( i_reg & 0x01 )
       {
-        ( regs16[ REG_CS ] = *( int16_t * )&mem[ op_from_addr + 2 ] ) ;
+        regs16[ REG_CS ] = *( int16_t * )&mem[ op_from_addr + 2 ] ;
       }
 
       if( i_w )
@@ -711,7 +713,10 @@ int main(int argc, char **argv)
     }
     else // PUSH
     {
-      R_M_PUSH( mem[ rm_addr ] ) ;
+      // PUSH mem[ rm_addr ].
+      i_w = 1 ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , mem[ rm_addr ] ) ;
+
     }
     break ;
 
@@ -1594,7 +1599,9 @@ int main(int argc, char **argv)
         }
         else // CALL
         {
-          R_M_PUSH( reg_ip ) ;
+          // PUSH reg_ip.
+          i_w = 1 ;
+          R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , reg_ip ) ;
         }
       }
 
@@ -1943,7 +1950,9 @@ int main(int argc, char **argv)
 
     // PUSH reg
     case 0x19 :
-      R_M_PUSH( regs16[ stOpcode.extra ] ) ;
+      // PUSH regs16[ stOpcode.extra ].
+      i_w = 1 ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ stOpcode.extra ] ) ;
       break ;
 
     // POP reg
