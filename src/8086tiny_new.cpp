@@ -2024,8 +2024,14 @@ int main(int argc, char **argv)
 
     // CALL FAR imm16:imm16
     case 0x20 :
-      R_M_PUSH( regs16[ REG_CS ] ) ;
-      R_M_PUSH( reg_ip + 5 ) ;
+      i_w = 1 ;
+
+      // PUSH regs16[ REG_CS ].
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_CS ] ) ;
+
+      // PUSH reg_ip + 5.
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , reg_ip + 5 ) ;
+
       regs16[ REG_CS ] = i_data2 ;
       reg_ip = i_data0 ;
       break ;
@@ -2033,7 +2039,10 @@ int main(int argc, char **argv)
     // PUSHF
     case 0x21 :
       make_flags() ;
-      R_M_PUSH( scratch_uint ) ;
+
+      // PUSH scratch_uint.
+      i_w = 1 ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , scratch_uint ) ;
       break ;
 
     // POPF
@@ -2282,7 +2291,10 @@ int main(int argc, char **argv)
 
     // 80186, NEC V20: ENTER
     case 0x33 :
-      R_M_PUSH( regs16[ REG_BP ] ) ;
+      // PUSH regs16[ REG_BP ].
+      i_w = 1 ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_BP ] ) ;
+
       scratch_uint = regs16[ REG_SP ] ;
 
       i_data2 &= 0x00ff ;
@@ -2294,10 +2306,15 @@ int main(int argc, char **argv)
         {
           scratch2_uint-- ;
           regs16[ REG_BP ] -= 2 ;
-          R_M_PUSH( regs16[ REG_BP ] ) ;
+
+          // PUSH regs16[ REG_BP ].
+          i_w = 1 ;
+          R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_BP ] ) ;
         }
 
-        R_M_PUSH( scratch_uint ) ;
+        // PUSH scratch_uint.
+        i_w = 1 ;
+        R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , scratch_uint ) ;
       }
 
       regs16[ REG_BP ]  = scratch_uint ;
@@ -2330,17 +2347,18 @@ int main(int argc, char **argv)
     // 80186, NEC V20: PUSHA
     case 0x35 :
       // PUSH AX, PUSH CX, PUSH DX, PUSH BX, PUSH SP, PUSH BP, PUSH SI, PUSH DI
-      R_M_PUSH( regs16[ REG_AX ] ) ;
-      R_M_PUSH( regs16[ REG_CX ] ) ;
-      R_M_PUSH( regs16[ REG_DX ] ) ;
-      R_M_PUSH( regs16[ REG_BX ] ) ;
+      i_w = 1 ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_AX ] ) ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_CX ] ) ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_DX ] ) ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_BX ] ) ;
 
       scratch_uint = regs16[ REG_SP ] ;
-      R_M_PUSH( scratch_uint ) ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , scratch_uint ) ;
 
-      R_M_PUSH( regs16[ REG_BP ] ) ;
-      R_M_PUSH( regs16[ REG_SI ] ) ;
-      R_M_PUSH( regs16[ REG_DI ] ) ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_BP ] ) ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_SI ] ) ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_DI ] ) ;
       break ;
 
     // 80186, NEC V20: POPA
