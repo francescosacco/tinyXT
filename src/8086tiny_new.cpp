@@ -272,11 +272,19 @@ int8_t pc_interrupt( uint8_t interrupt_num )
   i_w = 1 ;
 
   // PUSH scratch_uint.
-  R_M_OP( mem[16 * regs16[REG_SS] + (uint16_t)(--regs16[REG_SP])] , = , scratch_uint ) ;
+  op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+  op_source = *( uint16_t * )&scratch_uint ;
+  op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
+
   // PUSH regs16[ REG_CS ].
-  R_M_OP( mem[16 * regs16[REG_SS] + (uint16_t)(--regs16[REG_SP])] , = , regs16[ REG_CS ] ) ;
+  op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+  op_source = *( uint16_t * )&regs16[ REG_CS ] ;
+  op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
+
   // PUSH reg_ip.
-  R_M_OP( mem[16 * regs16[REG_SS] + (uint16_t)(--regs16[REG_SP])] , = , reg_ip ) ;
+  op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+  op_source = *( uint16_t * )&reg_ip ;
+  op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
 
   // Execute arithmetic/logic operations in emulator memory/registers
   if( i_w )
