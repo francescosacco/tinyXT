@@ -118,7 +118,6 @@ T8086TinyInterface_t Interface ;
 #define R_M_OP(dest,op,src) (i_w ? op_dest = *(uint16_t*)&dest, op_result = *(uint16_t*)&dest op (op_source = *(uint16_t*)&src) : (op_dest = dest, op_result = dest op (op_source = *(uint8_t*)&src)))
 
 // Helpers for stack operations
-#define R_M_PUSH(a) (i_w = 1, R_M_OP(mem[16 * regs16[REG_SS] + (uint16_t)(--regs16[REG_SP])], =, a))
 #define R_M_POP(a) (i_w = 1, regs16[REG_SP] += 2, R_M_OP(a, =, mem[16 * regs16[REG_SS] + (uint16_t)(-2+ regs16[REG_SP])]))
 
 // Global variable definitions
@@ -2384,12 +2383,16 @@ int main(int argc, char **argv)
 
     // 80186, NEC V20: PUSH imm16
     case 0x38 :
-      R_M_PUSH( i_data0 ) ;
+      // PUSH i_data0.
+      i_w = 1 ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , i_data0 ) ;
       break ;
 
     // 80186, NEC V20: PUSH imm8
     case 0x39 :
-      R_M_PUSH( i_data0 & 0x00FF ) ;
+      // PUSH ( i_data0 & 0x00FF )
+      i_w = 1 ;
+      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , i_data0 & 0x00FF ) ;
       break ;
 
     // 80186 IMUL
