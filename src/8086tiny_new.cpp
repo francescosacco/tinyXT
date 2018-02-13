@@ -681,7 +681,9 @@ int main(int argc, char **argv)
       {
         // PUSH regs16[ REG_CS ].
         i_w = 1 ;
-        R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t )( --regs16[ REG_SP ] ) ] , = , regs16[ REG_CS ] ) ;
+        op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+        op_source = *( uint16_t * )&regs16[ REG_CS ] ;
+        op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
       }
 
       // CALL (near or far)
@@ -689,7 +691,9 @@ int main(int argc, char **argv)
       {
         // PUSH ( reg_ip + 2 + i_mod * ( i_mod != 3 ) + 2 * ( !i_mod && i_rm == 6 ) ).
         i_w = 1 ;
-        R_M_OP( mem[ 16 * regs16[ REG_SS ] + (uint16_t)(--regs16[REG_SP])], =, reg_ip + 2 + i_mod * ( i_mod != 3 ) + 2 * ( !i_mod && i_rm == 6 ) ) ;
+        op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+        op_source = *( uint16_t * )&reg_ip + 2 + i_mod * ( i_mod != 3 ) + 2 * ( !i_mod && i_rm == 6 ) ;
+        op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
       }
 
       // JMP|CALL (far)
@@ -722,8 +726,9 @@ int main(int argc, char **argv)
     {
       // PUSH mem[ rm_addr ].
       i_w = 1 ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , mem[ rm_addr ] ) ;
-
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&mem[ rm_addr ] ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
     }
     break ;
 
@@ -1608,7 +1613,9 @@ int main(int argc, char **argv)
         {
           // PUSH reg_ip.
           i_w = 1 ;
-          R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , reg_ip ) ;
+          op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+          op_source = *( uint16_t * )&reg_ip ;
+          op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
         }
       }
 
@@ -1959,7 +1966,9 @@ int main(int argc, char **argv)
     case 0x19 :
       // PUSH regs16[ stOpcode.extra ].
       i_w = 1 ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ stOpcode.extra ] ) ;
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&regs16[ stOpcode.extra ] ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
       break ;
 
     // POP reg
@@ -2034,10 +2043,14 @@ int main(int argc, char **argv)
       i_w = 1 ;
 
       // PUSH regs16[ REG_CS ].
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_CS ] ) ;
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&regs16[ REG_CS ] ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
 
       // PUSH reg_ip + 5.
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , reg_ip + 5 ) ;
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&reg_ip + 5 ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
 
       regs16[ REG_CS ] = i_data2 ;
       reg_ip = i_data0 ;
@@ -2049,7 +2062,9 @@ int main(int argc, char **argv)
 
       // PUSH scratch_uint.
       i_w = 1 ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , scratch_uint ) ;
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&scratch_uint ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
       break ;
 
     // POPF
@@ -2300,7 +2315,9 @@ int main(int argc, char **argv)
     case 0x33 :
       // PUSH regs16[ REG_BP ].
       i_w = 1 ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_BP ] ) ;
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&regs16[ REG_BP ] ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
 
       scratch_uint = regs16[ REG_SP ] ;
 
@@ -2316,12 +2333,16 @@ int main(int argc, char **argv)
 
           // PUSH regs16[ REG_BP ].
           i_w = 1 ;
-          R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_BP ] ) ;
+          op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+          op_source = *( uint16_t * )&regs16[ REG_BP ] ;
+          op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
         }
 
         // PUSH scratch_uint.
         i_w = 1 ;
-        R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , scratch_uint ) ;
+        op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+        op_source = *( uint16_t * )&scratch_uint ;
+        op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
       }
 
       regs16[ REG_BP ]  = scratch_uint ;
@@ -2355,17 +2376,47 @@ int main(int argc, char **argv)
     case 0x35 :
       // PUSH AX, PUSH CX, PUSH DX, PUSH BX, PUSH SP, PUSH BP, PUSH SI, PUSH DI
       i_w = 1 ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_AX ] ) ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_CX ] ) ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_DX ] ) ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_BX ] ) ;
+
+      // PUSH regs16[ REG_AX ].
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&regs16[ REG_AX ] ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
+
+      // PUSH regs16[ REG_CX ].
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&regs16[ REG_CX ] ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
+
+      // PUSH regs16[ REG_DX ].
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&regs16[ REG_DX ] ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
+
+      // PUSH regs16[ REG_BX ].
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&regs16[ REG_BX ] ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
 
       scratch_uint = regs16[ REG_SP ] ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , scratch_uint ) ;
+      // PUSH scratch_uint.
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&scratch_uint ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
 
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_BP ] ) ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_SI ] ) ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , regs16[ REG_DI ] ) ;
+      // PUSH regs16[ REG_BP ].
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&regs16[ REG_BP ] ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
+
+      // PUSH regs16[ REG_SI ].
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&regs16[ REG_SI ] ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
+
+      // PUSH regs16[ REG_DI ].
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&regs16[ REG_DI ] ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
       break ;
 
     // 80186, NEC V20: POPA
@@ -2393,14 +2444,18 @@ int main(int argc, char **argv)
     case 0x38 :
       // PUSH i_data0.
       i_w = 1 ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , i_data0 ) ;
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&i_data0 ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
       break ;
 
     // 80186, NEC V20: PUSH imm8
     case 0x39 :
       // PUSH ( i_data0 & 0x00FF )
       i_w = 1 ;
-      R_M_OP( mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] , = , i_data0 & 0x00FF ) ;
+      op_dest   = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] ;
+      op_source = *( uint16_t * )&i_data0 & 0x00FF ;
+      op_result = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( --regs16[ REG_SP ] ) ] = op_source ;
       break ;
 
     // 80186 IMUL
