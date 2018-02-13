@@ -114,9 +114,6 @@ T8086TinyInterface_t Interface ;
                          set_CF((regs8[FLAG_CF] && (op_result == op_dest)) || (a op_result < a(int)op_dest)), \
                          set_AF_OF_arith()
 
-// Execute arithmetic/logic operations in emulator memory/registers
-#define R_M_OP(dest,op,src) (i_w ? op_dest = *(uint16_t*)&dest, op_result = *(uint16_t*)&dest op (op_source = *(uint16_t*)&src) : (op_dest = dest, op_result = dest op (op_source = *(uint8_t*)&src)))
-
 // Global variable definitions
 
 typedef struct STOPCODE_T
@@ -2423,33 +2420,47 @@ int main(int argc, char **argv)
 
       // POP regs16[ REG_DI ].
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( regs16[ REG_DI ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
+      op_dest   = *( uint16_t * )&regs16[ REG_DI ] ;
+      op_source = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ;
+      op_result = *( uint16_t * )&regs16[ REG_DI ] = op_source ;
 
       // POP regs16[ REG_SI ].
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( regs16[ REG_SI ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
+      op_dest   = *( uint16_t * )&regs16[ REG_SI ] ;
+      op_source = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ;
+      op_result = *( uint16_t * )&regs16[ REG_SI ] = op_source ;
 
       // POP regs16[ REG_BP ].
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( regs16[ REG_BP ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
+      op_dest   = *( uint16_t * )&regs16[ REG_BP ] ;
+      op_source = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ;
+      op_result = *( uint16_t * )&regs16[ REG_BP ] = op_source ;
 
       regs16[ REG_SP ] += 2 ;
 
       // POP regs16[ REG_BX ].
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( regs16[ REG_BX ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
+      op_dest   = *( uint16_t * )&regs16[ REG_BX ] ;
+      op_source = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ;
+      op_result = *( uint16_t * )&regs16[ REG_BX ] = op_source ;
 
       // POP regs16[ REG_DX ].
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( regs16[ REG_DX ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
+      op_dest   = *( uint16_t * )&regs16[ REG_DX ] ;
+      op_source = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ;
+      op_result = *( uint16_t * )&regs16[ REG_DX ] = op_source ;
 
       // POP regs16[ REG_CX ].
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( regs16[ REG_CX ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
+      op_dest   = *( uint16_t * )&regs16[ REG_CX ] ;
+      op_source = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ;
+      op_result = *( uint16_t * )&regs16[ REG_CX ] = op_source ;
 
       // POP regs16[ REG_AX ].
       regs16[ REG_SP ] += 2 ;
-      R_M_OP( regs16[ REG_AX ] , = , mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ) ;
+      op_dest   = *( uint16_t * )&regs16[ REG_AX ] ;
+      op_source = *( uint16_t * )&mem[ 16 * regs16[ REG_SS ] + ( uint16_t ) ( -2+ regs16[ REG_SP ] ) ] ;
+      op_result = *( uint16_t * )&regs16[ REG_AX ] = op_source ;
       break ;
 
     // 80186: BOUND
